@@ -1,0 +1,25 @@
+function [ structFile ] = extractFileInfoFromDataDir(path)
+    recDirStruct = dir2(path,'-r');
+    sizeOfSruct = length(recDirStruct);
+    for i = 1:sizeOfSruct
+        name = split(recDirStruct(i).name,'\');
+        for j = 1:length(name)
+            ifNumOfHulda = regexp(name(j),'\d+\.\d+','match');
+            isDate = regexp(name(j),'\d{2}\.\d{2}\.\d{2}','match');
+            if contains(name(j), 'Sec', 'IgnoreCase', true)
+                numOfSec = split(name(j), ' ');
+                if isstrprop(numOfSec(end),'digit')
+                    recDirStruct(i).section = numOfSec;
+                end
+            elseif length(numOfHulda) == 1
+                tmpFullName = split(ifNumOfHulda{1,1},'.')
+                numOfHulda = tmpFullName{2};
+                recDirStruct(i).RatNum = numOfHulda;
+            elseif length(isDate) == 
+                
+                    
+        end
+    end
+    structFile = recDirStruct;
+end
+
