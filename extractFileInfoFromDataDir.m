@@ -2,14 +2,20 @@ function [ structFile ] = extractFileInfoFromDataDir(path)
     recDirStruct = dir2(path,'-r');
     sizeOfSruct = length(recDirStruct);
     index = 1;
+%     if ~isempty(recDirStruct) && ismember('datenum',fieldnames(recDirStruct)) && ismember('isdir',fieldnames(recDirStruct))
+%         rmfield(recDirStruct, 'datenum');
+%         rmfield(recDirStruct, 'isdir');
+%     end
     for i = 1:sizeOfSruct
         name = split(recDirStruct(i).name,'\');
         recDirStruct(i).isPic = 0;
         recDirStruct(i).isDAPI = 0;
         recDirStruct(i).isFos = 0;
+        recDirStruct(i).Date = 0;
+        recDirStruct(i).RatNum = 0;
         for j = 1:length(name)
             ifNumOfHulda = regexp(name{j},'^\d+\.\d+$','match');
-            isDate = regexp(name{j},'^\d{2}\.\d{2}\.\d{2}$','match');
+            isDate = regexp(name{j},'^(\d{1}|\d{2})\.(\d{1}|\d{2})\.\d{2}$','match');
             isPic = regexp(name{j},'^\d{2}\.\d+([A-Z]|[a-z]|[0-9])*_\d+\s{1}((\w+|\w+\.\d+|\w+\-\w+)\s)+\d+x\.\w+$','match');
             if contains(name{j}, 'Sec', 'IgnoreCase', true)
                 numOfSec = split(name{j}, ' ');
