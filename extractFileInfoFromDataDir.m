@@ -1,6 +1,7 @@
 function [ structFile ] = extractFileInfoFromDataDir(path)
     recDirStruct = dir2(path,'-r');
     sizeOfSruct = length(recDirStruct);
+    index = 1;
     for i = 1:sizeOfSruct
         name = split(recDirStruct(i).name,'\');
         recDirStruct(i).isPic = 0;
@@ -31,15 +32,16 @@ function [ structFile ] = extractFileInfoFromDataDir(path)
                 elseif length(isFos) == 1
                     recDirStruct(i).isFos = 1;
                 end
-                magnification = regexp(regexp(name{j},'(\d+)x\.(\w+)$','match'), '\d+','match');
+                magnification = regexp(regexp(name{j},'\d+x\.\w+$','match'), '\d+','match');
                 picType = regexp(name{j},'\w+$','match');
                 recDirStruct(i).magnification = magnification{1};
                 recDirStruct(i).picType = picType{1};
-                disp(recDirStruct(i).magnification);
-                disp(recDirStruct(i).picType);
             end
         end
+        if recDirStruct(i).isPic == 1
+            structFile(index) = recDirStruct(i);
+            index = index + 1;
+        end
     end
-    structFile = recDirStruct;
 end
 

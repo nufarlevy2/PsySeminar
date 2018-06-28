@@ -31,13 +31,15 @@ function [ structFile ] = extractFileInfoFromDataDir(path)
                 elseif length(isFos) == 1
                     recDirStruct(i).isFos = 1;
                 end
-                magnification = regexp(name{j},'^\d{2}\.\d+[[A-Z]|[a-z]|[0-9]]*_\d+\s{1}[(\w+|\w+\.\d+|\w+\-\w+)\s]+(\d+)x\.\w+$','tokens');
-                picType = regexp(name{j},'^\d{2}\.\d+[[A-Z]|[a-z]|[0-9]]*_\d+\s{1}[(\w+|\w+\.\d+|\w+\-\w+)\s]+\d+x\.(\w+)$','tokens');
-                recDirStruct(i).magnification = magnification;
-                recDirStruct(i).picType = picType;
-                
+                magnification = regexp(regexp(name{j},'\d+x\.\w+$','match'), '\d+','match');
+                picType = regexp(name{j},'\w+$','match');
+                recDirStruct(i).magnification = magnification{1};
+                recDirStruct(i).picType = picType{1};
+                disp(recDirStruct(i).magnification);
+                disp(recDirStruct(i).picType);
             end
         end
+        if 
     end
     structFile = recDirStruct;
 end
