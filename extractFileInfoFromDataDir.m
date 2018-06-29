@@ -13,6 +13,7 @@ function [ structFile ] = extractFileInfoFromDataDir(path)
         recDirStruct(i).isFos = 0;
         recDirStruct(i).Date = 0;
         recDirStruct(i).RatNum = 0;
+        recDirStruct(i).magnification = 0;
         recDirStruct(i).fullPath = [];
         for j = 1:length(name)
             ifNumOfHulda = regexp(name{j},'^\d+\.\d+$','match');
@@ -26,7 +27,7 @@ function [ structFile ] = extractFileInfoFromDataDir(path)
             elseif length(ifNumOfHulda) == 1
                 tmp = split(ifNumOfHulda{1,1},'.');
                 numOfHulda = tmp{2};
-                recDirStruct(i).RatNum = numOfHulda;
+                recDirStruct(i).RatNum = str2double(numOfHulda);
             elseif length(isDate) == 1
                 date = isDate{1,1};
                 recDirStruct(i).Date = date;
@@ -41,7 +42,7 @@ function [ structFile ] = extractFileInfoFromDataDir(path)
                 end
                 magnification = regexp(regexp(name{j},'\d+x\.\w+$','match'), '\d+','match');
                 picType = regexp(name{j},'\w+$','match');
-                recDirStruct(i).magnification = magnification{1};
+                recDirStruct(i).magnification = str2double(magnification{1});
                 recDirStruct(i).picType = picType{1};
                 recDirStruct(i).fullPath = [recDirStruct(i).folder, '\', isPic{1}];
             end
