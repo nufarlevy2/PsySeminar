@@ -1,0 +1,11 @@
+function [ output_args ] = getContrastOfImage(fullPath, threshold, userFudgeFactor = .5)
+    I = imread(fullPath);
+    figure, imshow(I), title('original image');
+    BWI = im2bw(I, threshold);
+    figure, imshow(BWI), title('BW image');
+    [~, threshold] = edge(BWI, 'sobel');
+    fudgeFactor = .5;
+    BWs = edge(BWI,'sobel', threshold * fudgeFactor);
+    figure, imshow(BWs), title('binary gradient mask');
+end
+
