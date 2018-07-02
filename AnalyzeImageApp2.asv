@@ -114,9 +114,13 @@ function imagesListBox_Callback(hObject, eventdata, handles)
 % --- Executes on button press in saveButton.
 disp('imagesListBox_Callback');
 selectedIndex = get(handles.imagesListBox,'Value'); 
-currNames = get(handles.imagesListBox, 'string');
-currImage = currNames(selectedIndex);
-setappdata(handles.imagesListBox, 'currImage', currImage);
+images = getappdata(handles.imagesListBox, 'images');
+currDate = dateList(selectedIndex);
+setappdata(handles.imagesListBox, 'currDate', currDate);
+currRatNum = getappdata(handles.imagesListBox, 'currRatNum');
+currSection = getappdata(handles.imagesListBox, 'currSection');
+names = getImageList(images, currSection, currRatNum, currDate);
+set(handles.imagesListBox , 'string' ,names);
 
 function saveButton_Callback(hObject, eventdata, handles)
 % hObject    handle to saveButton (see GCBO)
@@ -130,23 +134,7 @@ function getContrastedImage_Callback(hObject, eventdata, handles)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
 disp('getContrastedImage_Callback');
-names = get(handles.imagesListBox, 'string');
-images = getappdata(handles.imagesListBox,'images');
-nameFieldArray = {images(:).name};
-currImage = getappdata(handles.imagesListBox, 'currImage');
-if strcmp(currImage, 'All') && length(names) > 1
-    for intI = 2: length(names)
-        imageIndex = find(strcmp(nameFieldArray, names(intI)));
-        BWPic = getContrastOfImage(images(imageIndex).fullPath, 0.1);
-%         I = imread(images(imageIndex).fullPath);
-        figure, imshow(BWPic), title(['Black And White Image: ',images(imageIndex).fullPath]);  
-    end
-else
-    disp('only one folder');
-    imageIndex = find(strcmp(nameFieldArray, currImage));
-    I = imread(images(imageIndex).fullPath);
-    figure, imshow(I), title(['original image: ',images(imageIndex).fullPath]);  
-end
+
 
 % --- Executes on button press in showOriginImage.
 function showOriginImage_Callback(hObject, eventdata, handles)
@@ -166,9 +154,7 @@ if strcmp(currImage, 'All') && length(names) > 1
     end
 else
     disp('only one folder');
-    imageIndex = find(strcmp(nameFieldArray, currImage));
-    I = imread(images(imageIndex).fullPath);
-    figure, imshow(I), title(['original image: ',images(imageIndex).fullPath]);  
+    
 end
 
 % --- Executes on button press in getImageWithMarkedNuerons.
