@@ -1,0 +1,218 @@
+function varargout = AnalyzeImageApp2(varargin)
+% ANALYZEIMAGEAPP2 MATLAB code for AnalyzeImageApp2.fig
+%      ANALYZEIMAGEAPP2, by itself, creates a new ANALYZEIMAGEAPP2 or raises the existing
+%      singleton*.
+%
+%      H = ANALYZEIMAGEAPP2 returns the handle to a new ANALYZEIMAGEAPP2 or the handle to
+%      the existing singleton*.
+%
+%      ANALYZEIMAGEAPP2('CALLBACK',hObject,eventData,handles,...) calls the local
+%      function named CALLBACK in ANALYZEIMAGEAPP2.M with the given input arguments.
+%
+%      ANALYZEIMAGEAPP2('Property','Value',...) creates a new ANALYZEIMAGEAPP2 or raises the
+%      existing singleton*.  Starting from the left, property value pairs are
+%      applied to the GUI before AnalyzeImageApp2_OpeningFcn gets called.  An
+%      unrecognized property name or invalid value makes property application
+%      stop.  All inputs are passed to AnalyzeImageApp2_OpeningFcn via varargin.
+%
+%      *See GUI Options on GUIDE's Tools menu.  Choose "GUI allows only one
+%      instance to run (singleton)".
+%
+% See also: GUIDE, GUIDATA, GUIHANDLES
+
+% Edit the above text to modify the response to help AnalyzeImageApp2
+
+% Last Modified by GUIDE v2.5 02-Jul-2018 15:10:51
+
+% Begin initialization code - DO NOT EDIT
+gui_Singleton = 1;
+gui_State = struct('gui_Name',       mfilename, ...
+                   'gui_Singleton',  gui_Singleton, ...
+                   'gui_OpeningFcn', @AnalyzeImageApp2_OpeningFcn, ...
+                   'gui_OutputFcn',  @AnalyzeImageApp2_OutputFcn, ...
+                   'gui_LayoutFcn',  [] , ...
+                   'gui_Callback',   []);
+if nargin && ischar(varargin{1})
+    gui_State.gui_Callback = str2func(varargin{1});
+end
+
+if nargout
+    [varargout{1:nargout}] = gui_mainfcn(gui_State, varargin{:});
+else
+    gui_mainfcn(gui_State, varargin{:});
+end
+% End initialization code - DO NOT EDIT
+
+
+% --- Executes just before AnalyzeImageApp2 is made visible.
+function AnalyzeImageApp2_OpeningFcn(hObject, eventdata, handles, varargin)
+% This function has no output args, see OutputFcn.
+% hObject    handle to figure
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+% varargin   command line arguments to AnalyzeImageApp2 (see VARARGIN)
+
+% Choose default command line output for AnalyzeImageApp2
+handles.output = hObject;
+
+% Update handles structure
+guidata(hObject, handles);
+
+% UIWAIT makes AnalyzeImageApp2 wait for user response (see UIRESUME)
+% uiwait(handles.figure1);
+
+
+% --- Outputs from this function are returned to the command line.
+function varargout = AnalyzeImageApp2_OutputFcn(hObject, eventdata, handles) 
+% varargout  cell array for returning output args (see VARARGOUT);
+% hObject    handle to figure
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+% Get default command line output from handles structure
+varargout{1} = handles.output;
+
+% imagesListBoxHandler = findobj(0, 'tag', 'imagesListBox');
+
+
+
+function imagesListBox_CreateFcn(hObject, eventdata, handles)
+% hObject    handle to imagesListBox (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    empty - handles not created until after all CreateFcns called
+
+% Hint: listbox controls usually have a white background on Windows.
+%       See ISPC and COMPUTER.
+if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
+    set(hObject,'BackgroundColor','white');
+end
+disp('stam1');
+images = extractFileInfoFromDataDir('C:\Users\levyn\Desktop\study\psySeminar\data');
+imagesListBoxHandler = findobj(0, 'tag', 'imagesListBox');
+% images = getappdata(imagesListBoxHandler, 'images');
+names = getImagesList(images, [], [], []);
+set(imagesListBoxHandler , 'string' ,names);
+
+function [names] = getImagesList(images, sections, retNums, dates)
+    index = 1;
+    for intI = 1:length(images)
+        if ((~isempty(retNums) && ~ismember(images(intI).retNum, retNums)) || ...
+                (~isempty(sections) && ~ismember(images(intI).Section, sections)) || ...
+                (~isempty(dates) && ~ismember(images(intI).Date, dates)))
+            names{index} = images(intI).name;
+            index = index + 1;
+        end
+    end
+
+function imagesListBox_Callback(hObject, eventdata, handles)
+% hObject    handle to retNumListBox (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+% Hints: contents = cellstr(get(hObject,'String')) returns retNumListBox contents as cell array
+%        contents{get(hObject,'Value')} returns selected item from retNumListBox
+
+% --- Executes on button press in saveButton.
+disp('stam21');
+
+function saveButton_Callback(hObject, eventdata, handles)
+% hObject    handle to saveButton (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+
+% --- Executes on button press in getContrastedImage.
+function getContrastedImage_Callback(hObject, eventdata, handles)
+% hObject    handle to getContrastedImage (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+
+% --- Executes on button press in showOriginImage.
+function showOriginImage_Callback(hObject, eventdata, handles)
+% hObject    handle to showOriginImage (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+
+% --- Executes on button press in getImageWithMarkedNuerons.
+function getImageWithMarkedNuerons_Callback(hObject, eventdata, handles)
+% hObject    handle to getImageWithMarkedNuerons (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+
+% --- Executes on button press in exportToExcel.
+function exportToExcel_Callback(hObject, eventdata, handles)
+% hObject    handle to exportToExcel (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+
+% --- Executes on selection change in sectionListBox.
+function sectionListBox_Callback(hObject, eventdata, handles)
+% hObject    handle to sectionListBox (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+% Hints: contents = cellstr(get(hObject,'String')) returns sectionListBox contents as cell array
+%        contents{get(hObject,'Value')} returns selected item from sectionListBox
+
+
+% --- Executes during object creation, after setting all properties.
+function sectionListBox_CreateFcn(hObject, eventdata, handles)
+% hObject    handle to sectionListBox (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    empty - handles not created until after all CreateFcns called
+
+% Hint: listbox controls usually have a white background on Windows.
+%       See ISPC and COMPUTER.
+if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
+    set(hObject,'BackgroundColor','white');
+end
+
+
+% --- Executes on selection change in retNumListBox.
+function retNumListBox_Callback(hObject, eventdata, handles)
+% hObject    handle to retNumListBox (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+% Hints: contents = cellstr(get(hObject,'String')) returns retNumListBox contents as cell array
+%        contents{get(hObject,'Value')} returns selected item from retNumListBox
+
+
+% --- Executes during object creation, after setting all properties.
+function retNumListBox_CreateFcn(hObject, eventdata, handles)
+% hObject    handle to retNumListBox (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    empty - handles not created until after all CreateFcns called
+
+% Hint: listbox controls usually have a white background on Windows.
+%       See ISPC and COMPUTER.
+if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
+    set(hObject,'BackgroundColor','white');
+end
+
+
+% --- Executes on selection change in dateListBox.
+function dateListBox_Callback(hObject, eventdata, handles)
+% hObject    handle to dateListBox (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+% Hints: contents = cellstr(get(hObject,'String')) returns dateListBox contents as cell array
+%        contents{get(hObject,'Value')} returns selected item from dateListBox
+
+
+% --- Executes during object creation, after setting all properties.
+function dateListBox_CreateFcn(hObject, eventdata, handles)
+% hObject    handle to dateListBox (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    empty - handles not created until after all CreateFcns called
+
+% Hint: listbox controls usually have a white background on Windows.
+%       See ISPC and COMPUTER.
+if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
+    set(hObject,'BackgroundColor','white');
+end
