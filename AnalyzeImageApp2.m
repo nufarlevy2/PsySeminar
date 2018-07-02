@@ -72,8 +72,16 @@ function varargout = AnalyzeImageApp2_OutputFcn(hObject, eventdata, handles)
 % Get default command line output from handles structure
 varargout{1} = handles.output;
 
-% imagesListBoxHandler = findobj(0, 'tag', 'imagesListBox');
 
+% imagesListBoxHandler = findobj(0, 'tag', 'imagesListBox');
+images = extractFileInfoFromDataDir('C:\Users\levyn\Desktop\study\psySeminar\data');
+setappdata(handles.imagesListBox,'images',images);
+setappdata(handles.imagesListBox, 'ratNumList', getRatNumList(images,[],[],[]));
+setappdata(handles.imagesListBox, 'sectionList', getSectionList(images,[],[],[]));
+setappdata(handles.imagesListBox, 'dateList', getDateList(images,[],[],[]));
+setappdata(handles.imagesListBox, 'currRatNum', 'All');
+setappdata(handles.imagesListBox, 'currSection', 'All');
+setappdata(handles.imagesListBox, 'currDate', 'All');
 
 
 function imagesListBox_CreateFcn(hObject, eventdata, handles)
@@ -103,6 +111,7 @@ function imagesListBox_Callback(hObject, eventdata, handles)
 
 % --- Executes on button press in saveButton.
 disp('imagesListBox_Callback');
+
 
 function saveButton_Callback(hObject, eventdata, handles)
 % hObject    handle to saveButton (see GCBO)
@@ -147,6 +156,16 @@ function sectionListBox_Callback(hObject, eventdata, handles)
 % Hints: contents = cellstr(get(hObject,'String')) returns sectionListBox contents as cell array
 %        contents{get(hObject,'Value')} returns selected item from sectionListBox
 disp('sectionListBox_Callback');
+selectedIndex = get(handles.sectionListBox,'Value'); 
+images = getappdata(handles.imagesListBox,'images');
+sectionList = getappdata(handles.imagesListBox, 'sectionList');
+currSection = sectionList(selectedIndex);
+setappdata(handles.imagesListBox, 'currSection', currSection);
+currDate = getappdata(handles.imagesListBox, 'currDate');
+currRatNum = getappdata(handles.imagesListBox, 'currRatNum');
+names = getImageList(images, currSection, currRatNum, currDate);
+set(handles.imagesListBox , 'string' ,names);
+
 
 % --- Executes during object creation, after setting all properties.
 function sectionListBox_CreateFcn(hObject, eventdata, handles)
@@ -175,6 +194,15 @@ function retNumListBox_Callback(hObject, eventdata, handles)
 % Hints: contents = cellstr(get(hObject,'String')) returns retNumListBox contents as cell array
 %        contents{get(hObject,'Value')} returns selected item from retNumListBox
 disp('retNumListBox_Callback');
+selectedIndex = get(handles.retNumListBox,'Value'); 
+images = getappdata(handles.imagesListBox,'images');
+ratNumList = getappdata(handles.imagesListBox, 'ratNumList');
+currRatNum = ratNumList(selectedIndex);
+setappdata(handles.imagesListBox, 'currRatNum', currRatNum);
+currDate = getappdata(handles.imagesListBox, 'currDate');
+currSection = getappdata(handles.imagesListBox, 'currSection');
+names = getImageList(images, currSection, currRatNum, currDate);
+set(handles.imagesListBox , 'string' ,names);
 
 % --- Executes during object creation, after setting all properties.
 function retNumListBox_CreateFcn(hObject, eventdata, handles)
@@ -203,6 +231,15 @@ function dateListBox_Callback(hObject, eventdata, handles)
 % Hints: contents = cellstr(get(hObject,'String')) returns dateListBox contents as cell array
 %        contents{get(hObject,'Value')} returns selected item from dateListBox
 disp('dateListBox_Callback');
+selectedIndex = get(handles.dateListBox,'Value'); 
+images = getappdata(handles.imagesListBox,'images');
+dateList = getappdata(handles.imagesListBox, 'dateList');
+currDate = dateList(selectedIndex);
+setappdata(handles.imagesListBox, 'currDate', currDate);
+currRatNum = getappdata(handles.imagesListBox, 'currRatNum');
+currSection = getappdata(handles.imagesListBox, 'currSection');
+names = getImageList(images, currSection, currRatNum, currDate);
+set(handles.imagesListBox , 'string' ,names);
 
 % --- Executes during object creation, after setting all properties.
 function dateListBox_CreateFcn(hObject, eventdata, handles)
