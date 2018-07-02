@@ -1,35 +1,35 @@
-function varargout = AnalyzeImageApp2(varargin)
-% ANALYZEIMAGEAPP2 MATLAB code for AnalyzeImageApp2.fig
-%      ANALYZEIMAGEAPP2, by itself, creates a new ANALYZEIMAGEAPP2 or raises the existing
+function varargout = AnalyzeImageApp6(varargin)
+% ANALYZEIMAGEAPP6 MATLAB code for AnalyzeImageApp6.fig
+%      ANALYZEIMAGEAPP6, by itself, creates a new ANALYZEIMAGEAPP6 or raises the existing
 %      singleton*.
 %
-%      H = ANALYZEIMAGEAPP2 returns the handle to a new ANALYZEIMAGEAPP2 or the handle to
+%      H = ANALYZEIMAGEAPP6 returns the handle to a new ANALYZEIMAGEAPP6 or the handle to
 %      the existing singleton*.
 %
-%      ANALYZEIMAGEAPP2('CALLBACK',hObject,eventData,handles,...) calls the local
-%      function named CALLBACK in ANALYZEIMAGEAPP2.M with the given input arguments.
+%      ANALYZEIMAGEAPP6('CALLBACK',hObject,eventData,handles,...) calls the local
+%      function named CALLBACK in ANALYZEIMAGEAPP6.M with the given input arguments.
 %
-%      ANALYZEIMAGEAPP2('Property','Value',...) creates a new ANALYZEIMAGEAPP2 or raises the
+%      ANALYZEIMAGEAPP6('Property','Value',...) creates a new ANALYZEIMAGEAPP6 or raises the
 %      existing singleton*.  Starting from the left, property value pairs are
-%      applied to the GUI before AnalyzeImageApp2_OpeningFcn gets called.  An
+%      applied to the GUI before AnalyzeImageApp6_OpeningFcn gets called.  An
 %      unrecognized property name or invalid value makes property application
-%      stop.  All inputs are passed to AnalyzeImageApp2_OpeningFcn via varargin.
+%      stop.  All inputs are passed to AnalyzeImageApp6_OpeningFcn via varargin.
 %
 %      *See GUI Options on GUIDE's Tools menu.  Choose "GUI allows only one
 %      instance to run (singleton)".
 %
 % See also: GUIDE, GUIDATA, GUIHANDLES
 
-% Edit the above text to modify the response to help AnalyzeImageApp2
+% Edit the above text to modify the response to help AnalyzeImageApp6
 
-% Last Modified by GUIDE v2.5 02-Jul-2018 15:10:51
+% Last Modified by GUIDE v2.5 02-Jul-2018 21:50:02
 
 % Begin initialization code - DO NOT EDIT
 gui_Singleton = 1;
 gui_State = struct('gui_Name',       mfilename, ...
                    'gui_Singleton',  gui_Singleton, ...
-                   'gui_OpeningFcn', @AnalyzeImageApp2_OpeningFcn, ...
-                   'gui_OutputFcn',  @AnalyzeImageApp2_OutputFcn, ...
+                   'gui_OpeningFcn', @AnalyzeImageApp6_OpeningFcn, ...
+                   'gui_OutputFcn',  @AnalyzeImageApp6_OutputFcn, ...
                    'gui_LayoutFcn',  [] , ...
                    'gui_Callback',   []);
 if nargin && ischar(varargin{1})
@@ -44,26 +44,26 @@ end
 % End initialization code - DO NOT EDIT
 
 
-% --- Executes just before AnalyzeImageApp2 is made visible.
-function AnalyzeImageApp2_OpeningFcn(hObject, eventdata, handles, varargin)
+% --- Executes just before AnalyzeImageApp6 is made visible.
+function AnalyzeImageApp6_OpeningFcn(hObject, eventdata, handles, varargin)
 % This function has no output args, see OutputFcn.
 % hObject    handle to figure
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
-% varargin   command line arguments to AnalyzeImageApp2 (see VARARGIN)
+% varargin   command line arguments to AnalyzeImageApp6 (see VARARGIN)
 
-% Choose default command line output for AnalyzeImageApp2
+% Choose default command line output for AnalyzeImageApp6
 handles.output = hObject;
 
 % Update handles structure
 guidata(hObject, handles);
 
-% UIWAIT makes AnalyzeImageApp2 wait for user response (see UIRESUME)
+% UIWAIT makes AnalyzeImageApp6 wait for user response (see UIRESUME)
 % uiwait(handles.figure1);
 
 
 % --- Outputs from this function are returned to the command line.
-function varargout = AnalyzeImageApp2_OutputFcn(hObject, eventdata, handles) 
+function varargout = AnalyzeImageApp6_OutputFcn(hObject, eventdata, handles) 
 % varargout  cell array for returning output args (see VARARGOUT);
 % hObject    handle to figure
 % eventdata  reserved - to be defined in a future version of MATLAB
@@ -114,13 +114,9 @@ function imagesListBox_Callback(hObject, eventdata, handles)
 % --- Executes on button press in saveButton.
 disp('imagesListBox_Callback');
 selectedIndex = get(handles.imagesListBox,'Value'); 
-images = getappdata(handles.imagesListBox, 'images');
-currDate = dateList(selectedIndex);
-setappdata(handles.imagesListBox, 'currDate', currDate);
-currRatNum = getappdata(handles.imagesListBox, 'currRatNum');
-currSection = getappdata(handles.imagesListBox, 'currSection');
-names = getImageList(images, currSection, currRatNum, currDate);
-set(handles.imagesListBox , 'string' ,names);
+currNames = get(handles.imagesListBox, 'string');
+currImage = currNames(selectedIndex);
+setappdata(handles.imagesListBox, 'currImage', currImage);
 
 function saveButton_Callback(hObject, eventdata, handles)
 % hObject    handle to saveButton (see GCBO)
@@ -134,7 +130,23 @@ function getContrastedImage_Callback(hObject, eventdata, handles)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
 disp('getContrastedImage_Callback');
-
+names = get(handles.imagesListBox, 'string');
+images = getappdata(handles.imagesListBox,'images');
+nameFieldArray = {images(:).name};
+currImage = getappdata(handles.imagesListBox, 'currImage');
+threshold = get(handles.thresholdLabel, 'string');
+if strcmp(currImage, 'All') && length(names) > 1
+    for intI = 2: length(names)
+        imageIndex = find(strcmp(nameFieldArray, names(intI)));
+        BWPic = getContrastOfImage(images(imageIndex).fullPath, str2double(threshold));
+        figure, imshow(BWPic), title(['Black And White Image: ',images(imageIndex).fullPath]);  
+    end
+else
+    disp('only one folder');
+    imageIndex = find(strcmp(nameFieldArray, currImage));
+    I = imread(images(imageIndex).fullPath);
+    figure, imshow(I), title(['original image: ',images(imageIndex).fullPath]);  
+end
 
 % --- Executes on button press in showOriginImage.
 function showOriginImage_Callback(hObject, eventdata, handles)
@@ -154,7 +166,9 @@ if strcmp(currImage, 'All') && length(names) > 1
     end
 else
     disp('only one folder');
-    
+    imageIndex = find(strcmp(nameFieldArray, currImage));
+    I = imread(images(imageIndex).fullPath);
+    figure, imshow(I), title(['original image: ',images(imageIndex).fullPath]);  
 end
 
 % --- Executes on button press in getImageWithMarkedNuerons.
@@ -281,3 +295,55 @@ images = extractFileInfoFromDataDir('C:\Users\levyn\Desktop\study\psySeminar\dat
 dateListBoxHandler = findobj(0, 'tag', 'dateListBox');
 dates = getDateList(images, [], [], []);
 set(dateListBoxHandler , 'string' ,dates);
+
+
+% --- Executes on slider movement.
+function thresholdSlider_Callback(hObject, eventdata, handles)
+% hObject    handle to thresholdSlider (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+% Hints: get(hObject,'Value') returns position of slider
+%        get(hObject,'Min') and get(hObject,'Max') to determine range of slider
+disp('thresholdSlider_Callback');
+threshold =  get(hObject,'Value');
+if threshold >= 0 || threshold <= 1
+    set(handles.thresholdLabel, 'string', num2str(threshold));
+end
+
+% --- Executes during object creation, after setting all properties.
+function thresholdSlider_CreateFcn(hObject, eventdata, handles)
+% hObject    handle to thresholdSlider (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    empty - handles not created until after all CreateFcns called
+
+% Hint: slider controls usually have a light gray background.
+if isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
+    set(hObject,'BackgroundColor',[.9 .9 .9]);
+end
+disp('thresholdSlider_CreateFcn');
+set(hObject, 'Max', 1, 'Min', 0, 'SliderStep' , [1/100,1/100]);
+
+
+
+function thresholdLabel_Callback(hObject, eventdata, handles)
+% hObject    handle to thresholdLabel (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+% Hints: get(hObject,'String') returns contents of thresholdLabel as text
+%        str2double(get(hObject,'String')) returns contents of thresholdLabel as a double
+
+
+% --- Executes during object creation, after setting all properties.
+function thresholdLabel_CreateFcn(hObject, eventdata, handles)
+% hObject    handle to thresholdLabel (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    empty - handles not created until after all CreateFcns called
+
+% Hint: edit controls usually have a white background on Windows.
+%       See ISPC and COMPUTER.
+if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
+    set(hObject,'BackgroundColor','white');
+end
+set(hObject, 'string', '0.1');

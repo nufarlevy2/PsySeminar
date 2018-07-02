@@ -22,7 +22,7 @@ function varargout = AnalyzeImageApp2(varargin)
 
 % Edit the above text to modify the response to help AnalyzeImageApp2
 
-% Last Modified by GUIDE v2.5 02-Jul-2018 21:32:26
+% Last Modified by GUIDE v2.5 02-Jul-2018 15:10:51
 
 % Begin initialization code - DO NOT EDIT
 gui_Singleton = 1;
@@ -295,25 +295,3 @@ images = extractFileInfoFromDataDir('C:\Users\levyn\Desktop\study\psySeminar\dat
 dateListBoxHandler = findobj(0, 'tag', 'dateListBox');
 dates = getDateList(images, [], [], []);
 set(dateListBoxHandler , 'string' ,dates);
-
-
-% --- Executes on slider movement.
-function thresholdSlider_Callback(hObject, eventdata, handles)
-% hObject    handle to thresholdSlider (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    structure with handles and user data (see GUIDATA)
-
-% Hints: get(hObject,'Value') returns position of slider
-%        get(hObject,'Min') and get(hObject,'Max') to determine range of slider
-
-
-% --- Executes during object creation, after setting all properties.
-function thresholdSlider_CreateFcn(hObject, eventdata, handles)
-% hObject    handle to thresholdSlider (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    empty - handles not created until after all CreateFcns called
-
-% Hint: slider controls usually have a light gray background.
-if isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
-    set(hObject,'BackgroundColor',[.9 .9 .9]);
-end
