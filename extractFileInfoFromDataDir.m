@@ -37,8 +37,10 @@ function [ structFile ] = extractFileInfoFromDataDir(path)
                 isFos = regexp(name{j},'^\d{2}\.\d+([A-Z]|[a-z]|[0-9])*_\d+\s{1}((\w+|\w+\.\d+|\w+\-\w+)\s){1}Fos\s{1}\d+x\.\w+$','match');
                 if length(isDAPI) == 1
                     recDirStruct(i).isDAPI = 1;
+                    recDirStruct(i).staining = 'DAPI';
                 elseif length(isFos) == 1
                     recDirStruct(i).isFos = 1;
+                    recDirStruct(i).staining = 'Fos';
                 end
                 magnification = regexp(regexp(name{j},'\d+x\.\w+$','match'), '\d+','match');
                 picType = regexp(name{j},'\w+$','match');

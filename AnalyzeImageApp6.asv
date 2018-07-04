@@ -423,9 +423,9 @@ function magnificationListBox_Callback(hObject, eventdata, handles)
 % Hints: contents = cellstr(get(hObject,'String')) returns magnificationListBox contents as cell array
 %        contents{get(hObject,'Value')} returns selected item from magnificationListBox
 disp('magnificationListBox_Callback');
-selectedIndex = get(handles.magnificationListBox,'Value'); 
+selectedIndex = get(handles.stainingListBox,'Value'); 
 images = getappdata(handles.imagesListBox,'images');
-magList = getappdata(handles.imagesListBox, 'magList');
+magList = metappdata(handles.imagesListBox, 'magList');
 currMag = magList(selectedIndex);
 setappdata(handles.imagesListBox, 'currMag', currMag);
 currSection = getappdata(handles.imagesListBox, 'currSection');

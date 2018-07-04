@@ -1,4 +1,4 @@
-function [names] = getDateList(images, section, retNum, date, mag, staining)
+function [names] = getMagList(images, section, retNum, date, mag, staining)
     index = 2;
     names = {'All'};
     for intI = 1:length(images)
@@ -7,8 +7,8 @@ function [names] = getDateList(images, section, retNum, date, mag, staining)
                 (isempty(date) || strcmp('All', date) || strcmp(images(intI).Date, date))) && ...
                 (isempty(mag) || strcmp('All', mag) || images(intI).magnification == str2double(mag{1})) && ...
                 (isempty(staining) || strcmp('All', staining) || strcmp(images(intI).staining, staining)) && ... 
-                ~ismember(images(intI).Date, names)) 
-            names{index} = images(intI).Date;
+                ~ismember(num2str(images(intI).magnification), names)) 
+            names{index} = num2str(images(intI).magnification);
             index = index + 1;
         end
     end
