@@ -22,7 +22,7 @@ function varargout = AnalyzeImageApp6(varargin)
 
 % Edit the above text to modify the response to help AnalyzeImageApp6
 
-% Last Modified by GUIDE v2.5 04-Jul-2018 15:19:56
+% Last Modified by GUIDE v2.5 30-Jul-2018 19:30:01
 
 % Begin initialization code - DO NOT EDIT
 gui_Singleton = 1;
@@ -181,6 +181,17 @@ function getImageWithMarkedNuerons_Callback(hObject, eventdata, handles)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
 disp('getImageWithMarkedNuerons_Callback');
+images = getappdata(handles.imagesListBox, 'images');
+currDate = getappdata(handles.imagesListBox, 'currDate');
+currRatNum = getappdata(handles.imagesListBox, 'currRatNum');
+currStaining = getappdata(handles.imagesListBox, 'currStaining');
+currMag = getappdata(handles.imagesListBox, 'currMag');
+currSection = getappdata(handles.imagesListBox, 'currSection');
+pathes = getImageList(images, currSection, currRatNum, currDate, currMag, currStaining);
+for pathIndex = 1: length(pathes)
+%% continue with sending images to function and display them according to the table
+end
+
 
 % --- Executes on button press in exportToExcel.
 function exportToExcel_Callback(hObject, eventdata, handles)
@@ -491,3 +502,17 @@ images = extractFileInfoFromDataDir('C:\Users\levyn\Desktop\study\psySeminar\dat
 stainingListBoxHandler = findobj(0, 'tag', 'stainingListBox');
 stainingList = getStainingList(images, [], [], [], [], []);
 set(stainingListBoxHandler , 'string' ,stainingList);
+
+
+% --- Executes when entered data in editable cell(s) in sizesTable.
+function sizesTable_CellEditCallback(hObject, eventdata, handles)
+% hObject    handle to sizesTable (see GCBO)
+% eventdata  structure with the following fields (see MATLAB.UI.CONTROL.TABLE)
+%	Indices: row and column indices of the cell(s) edited
+%	PreviousData: previous data for the cell(s) edited
+%	EditData: string(s) entered by the user
+%	NewData: EditData or its converted form set on the Data property. Empty if Data was not changed
+%	Error: error string when failed to convert EditData to appropriate value for Data
+% handles    structure with handles and user data (see GUIDATA)
+disp('sizesTable_CellEditCallback');
+tableValues = get(hObject, 'Data');
