@@ -41,6 +41,7 @@ if nargout
 else
     gui_mainfcn(gui_State, varargin{:});
 end
+warning('off','all');
 % End initialization code - DO NOT EDIT
 
 
