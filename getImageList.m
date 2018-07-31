@@ -11,6 +11,10 @@ function [names] = getImageList(images, section, retNum, date, mag, staining)
             index = index + 1;
         end
     end
+    objectsExist = exist('names', 'var');
+    if ~objectsExist
+        names = {''};
+    end    
 end
 
 

@@ -145,6 +145,8 @@ if strcmp(currImage, 'All') && length(names) > 1
         BWPic = getContrastOfImage(images(imageIndex).fullPath, str2double(threshold));
         figure, imshow(BWPic), title(['Black And White Image: ',images(imageIndex).fullPath]);  
     end
+elseif strcmp(currImage, 'All') && length(names) == 1
+    disp('none of the pics were chosen!');
 else
     disp('only one folder');
     imageIndex = find(strcmp(nameFieldArray, currImage));
@@ -168,6 +170,8 @@ if strcmp(currImage, 'All') && length(names) > 1
         I = imread(images(imageIndex).fullPath);
         figure, imshow(I), title(['original image: ',images(imageIndex).fullPath]);  
     end
+elseif strcmp(currImage, 'All') && length(names) == 1
+    disp('none of the pics were chosen!');
 else
     disp('only one folder');
     imageIndex = find(strcmp(nameFieldArray, currImage));
@@ -187,9 +191,20 @@ currRatNum = getappdata(handles.imagesListBox, 'currRatNum');
 currStaining = getappdata(handles.imagesListBox, 'currStaining');
 currMag = getappdata(handles.imagesListBox, 'currMag');
 currSection = getappdata(handles.imagesListBox, 'currSection');
-pathes = getImageList(images, currSection, currRatNum, currDate, currMag, currStaining);
-for pathIndex = 1: length(pathes)
-%% continue with sending images to function and display them according to the table
+currImage = getappdata(handles.imagesListBox, 'currImage');
+nameFieldArray = {images(:).name};
+objects = getObjectList(images, currSection, currRatNum, currDate, currMag, currStaining);
+tableOfThresholds = get(handles.sizesTable, 'Data');
+[thresholds] = getValuesFromTable(tableOfThresholds);
+if ~isempty(objects) && ~strcmp(currImage, 'All')
+    imageIndex = find(strcmp(nameFieldArray, currImage));
+    objects(1) = images(imageIndex);
+end
+if ~isempty(objects)
+    for oIndex = 1: length(objects(1))
+        [I, imageTitle] = getCellCountImage(objects(oIndex), thresholds);
+        figure, imshow(I), title(imageTitle);
+    end
 end
 
 
