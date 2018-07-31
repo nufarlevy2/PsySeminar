@@ -41,7 +41,7 @@ if nargout
 else
     gui_mainfcn(gui_State, varargin{:});
 end
-warning('off','all');
+% warning('off','all');
 % End initialization code - DO NOT EDIT
 
 
@@ -202,7 +202,7 @@ if ~isempty(objects) && ~strcmp(currImage, 'All')
     objects(1) = images(imageIndex);
 end
 if ~isempty(objects)
-    for oIndex = 1: length(objects(1))
+    for oIndex = 1: size(objects,2)
         [I, imageTitle] = getCellCountImage(objects(oIndex), thresholds);
         figure, imshow(I), title(imageTitle);
     end
@@ -215,6 +215,28 @@ function exportToExcel_Callback(hObject, eventdata, handles)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
 disp('exportToExcel_Callback');
+images = getappdata(handles.imagesListBox, 'images');
+currDate = getappdata(handles.imagesListBox, 'currDate');
+currRatNum = getappdata(handles.imagesListBox, 'currRatNum');
+currStaining = getappdata(handles.imagesListBox, 'currStaining');
+currMag = getappdata(handles.imagesListBox, 'currMag');
+currSection = getappdata(handles.imagesListBox, 'currSection');
+currImage = getappdata(handles.imagesListBox, 'currImage');
+nameFieldArray = {images(:).name};
+objects = getObjectList(images, currSection, currRatNum, currDate, currMag, currStaining);
+tableOfThresholds = get(handles.sizesTable, 'Data');
+[thresholds] = getValuesFromTable(tableOfThresholds);
+if ~isempty(objects) && ~strcmp(currImage, 'All')
+    imageIndex = find(strcmp(nameFieldArray, currImage));
+    objects(1) = images(imageIndex);
+end
+if ~isempty(objects)
+    for oIndex = 1: size(objects, 2)
+        structToExport(oIndex) = getCellCountImageForExcel(objects(oIndex), thresholds);
+    end
+    structToExport = countOverlapCircles(objects, structToExport);
+    writetable(struct2table(structToExport), 'someexcelfile.xlsx');
+end
 
 % --- Executes on selection change in sectionListBox.
 function sectionListBox_Callback(hObject, eventdata, handles)

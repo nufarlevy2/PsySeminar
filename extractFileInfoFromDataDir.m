@@ -47,6 +47,10 @@ function [ structFile ] = extractFileInfoFromDataDir(path)
                 recDirStruct(i).magnification = str2double(magnification{1});
                 recDirStruct(i).picType = picType{1};
                 recDirStruct(i).fullPath = [recDirStruct(i).folder, '\', isPic{1}];
+                splitedName = split(name{j}, ' ');
+                if length(splitedName) > 2
+                    recDirStruct(i).Staining_Sub_Type = splitedName{2};
+                end
             end
         end
         if recDirStruct(i).isPic == 1
