@@ -215,6 +215,13 @@ function exportToExcel_Callback(hObject, eventdata, handles)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
 disp('exportToExcel_Callback');
+filter = {'*xlsx'};
+[file,path] = uiputfile(filter);
+if isempty(regexp(file, '.xlsx', 'match'))
+    file = [file, '.xlsx'];
+end 
+loadingBarMessage = 'Creating the Excel File...';
+loadingBar = waitbar(0, loadingBarMessage);
 images = getappdata(handles.imagesListBox, 'images');
 currDate = getappdata(handles.imagesListBox, 'currDate');
 currRatNum = getappdata(handles.imagesListBox, 'currRatNum');
@@ -226,16 +233,35 @@ nameFieldArray = {images(:).name};
 objects = getObjectList(images, currSection, currRatNum, currDate, currMag, currStaining);
 tableOfThresholds = get(handles.sizesTable, 'Data');
 [thresholds] = getValuesFromTable(tableOfThresholds);
+loadingBarMessage = sprintf("10%% - Starting Image Processing,\nplease wait this could take a few minutes!");
+waitbar(0.1, loadingBar, loadingBarMessage);
 if ~isempty(objects) && ~strcmp(currImage, 'All')
     imageIndex = find(strcmp(nameFieldArray, currImage));
-    objects(1) = images(imageIndex);
+    objects = images(imageIndex);
 end
 if ~isempty(objects)
-    for oIndex = 1: size(objects, 2)
+    parfor oIndex = 1: size(objects, 2)
         structToExport(oIndex) = getCellCountImageForExcel(objects(oIndex), thresholds);
     end
+    loadingBarMessage = sprintf("90%% - Image processing finished,\nsaving results to the excel file!");
+    waitbar(0.9, loadingBar, loadingBarMessage);
+%     precentage = (ceil((oIndex/(size(objects, 2)))*100)-1)/100;
+%     waitbar(precentage, loadingBar, [loadingBarMessage, ' ', num2str(precentage*100), '%']);
     structToExport = countOverlapCircles(objects, structToExport);
-    writetable(struct2table(structToExport), 'someexcelfile.xlsx');
+    writeToTable = struct2table(structToExport);
+    if exist([path, file],'file') == 2
+        delete([path, file]);
+    end
+    writetable(writeToTable, [path, file]);
+    readFromTable = readtable([path, file]);
+    readStruct = cellfun(@num2str,table2cell(readFromTable), 'UniformOutput', false);
+    writeStruct = cellfun(@num2str,table2cell(writeToTable), 'UniformOutput', false);
+    if isequal(readStruct, writeStruct)
+        waitbar(1, loadingBar, '100% - Finished Creating the Excel File!');
+    else
+        waitbar(0, loadingBar, 'Failed To Create The Excel File!');
+    end
+    
 end
 
 % --- Executes on selection change in sectionListBox.
