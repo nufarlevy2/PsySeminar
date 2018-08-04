@@ -1,4 +1,4 @@
-function [ count ] = getNumOfCellsFromImage( pathOfCircledOutImage, I, contrastThreshold, minThreshold, maxThreshold, pathOfResultedImage, originImagePath )
+function [ count, resultCenters, resultRadiuses ] = getNumOfCellsFromImage( pathOfCircledOutImage, I, contrastThreshold, minThreshold, maxThreshold, pathOfResultedImage, originImagePath )
     stats = regionprops('table',I,'Centroid','MajorAxisLength','MinorAxisLength');
     centers = stats.Centroid;
     diameters = mean([stats.MajorAxisLength stats.MinorAxisLength],2);
@@ -47,15 +47,27 @@ function [ count ] = getNumOfCellsFromImage( pathOfCircledOutImage, I, contrastT
         imwrite(I, [nameOfPic,'_tmpImage.tif'],'tif', 'WriteMode', 'overwrite');
 %         figure, imshow(I);
     end
+    if ~isempty(countIndexes)
+        resultCenters = relevantCentersToBeColored;
+        resultRadiuses = relevantRadiusesToBeColored;
+    else
+        resultCenters = [];
+        resultRadiuses = [];
+    end
     if ~isempty(needToContinue)
-        count = getNumOfCellsFromImage([nameOfPic,'_tmpImage.tif'], getContrastOfImage([nameOfPic,'_tmpImage.tif'],contrastThreshold + 0.03) , contrastThreshold + 0.03, minThreshold, maxThreshold, [nameOfPic,'_resultImage.tif'], originImagePath) + count;
+        [currCount, currCenters, currRadiuses] = getNumOfCellsFromImage([nameOfPic,'_tmpImage.tif'], getContrastOfImage([nameOfPic,'_tmpImage.tif'],contrastThreshold + 0.03) , contrastThreshold + 0.03, minThreshold, maxThreshold, [nameOfPic,'_resultImage.tif'], originImagePath);
+        count = count + currCount;
+        if ~isempty(currCenters)
+            resultCenters(((size(resultCenters,1)+1) : (size(resultCenters,1)+size(currCenters,1))),1:2) = currCenters;
+            resultRadiuses(((length(resultRadiuses)+1) : (length(resultRadiuses)+length(currRadiuses))),1) = currRadiuses;
+        end
     end
     if strcmp(originImagePath, pathOfCircledOutImage)
         newPathOfResultedImage = [originImagePath,'_algoritemResult.tif'];
         resultImage = imread([nameOfPic,'_resultImage.tif']);
         imwrite(resultImage, newPathOfResultedImage, 'tif');
         delete([nameOfPic,'_tmpImage.tif']) 
-        delete([nameOfPic,'_resultImage.tif']);
+        delete([nameOfPic,'_resultImage.tif']);  
     end
 end
 

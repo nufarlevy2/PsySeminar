@@ -41,7 +41,7 @@ if nargout
 else
     gui_mainfcn(gui_State, varargin{:});
 end
-% warning('off','all');
+warning('off','all');
 % End initialization code - DO NOT EDIT
 
 
@@ -199,7 +199,7 @@ tableOfThresholds = get(handles.sizesTable, 'Data');
 [thresholds] = getValuesFromTable(tableOfThresholds);
 if ~isempty(objects) && ~strcmp(currImage, 'All')
     imageIndex = find(strcmp(nameFieldArray, currImage));
-    objects(1) = images(imageIndex);
+    objects = images(imageIndex);
 end
 if ~isempty(objects)
     for oIndex = 1: size(objects,2)
@@ -217,53 +217,54 @@ function exportToExcel_Callback(hObject, eventdata, handles)
 disp('exportToExcel_Callback');
 filter = {'*xlsx'};
 [file,path] = uiputfile(filter);
-if isempty(regexp(file, '.xlsx', 'match'))
-    file = [file, '.xlsx'];
-end 
-loadingBarMessage = 'Creating the Excel File...';
-loadingBar = waitbar(0, loadingBarMessage);
-images = getappdata(handles.imagesListBox, 'images');
-currDate = getappdata(handles.imagesListBox, 'currDate');
-currRatNum = getappdata(handles.imagesListBox, 'currRatNum');
-currStaining = getappdata(handles.imagesListBox, 'currStaining');
-currMag = getappdata(handles.imagesListBox, 'currMag');
-currSection = getappdata(handles.imagesListBox, 'currSection');
-currImage = getappdata(handles.imagesListBox, 'currImage');
-nameFieldArray = {images(:).name};
-objects = getObjectList(images, currSection, currRatNum, currDate, currMag, currStaining);
-tableOfThresholds = get(handles.sizesTable, 'Data');
-[thresholds] = getValuesFromTable(tableOfThresholds);
-loadingBarMessage = sprintf("10%% - Starting Image Processing,\nplease wait this could take a few minutes!");
-waitbar(0.1, loadingBar, loadingBarMessage);
-if ~isempty(objects) && ~strcmp(currImage, 'All')
-    imageIndex = find(strcmp(nameFieldArray, currImage));
-    objects = images(imageIndex);
+if ~isempty(file)   
+    if isempty(regexp(file, '.xlsx', 'match'))
+        file = [file, '.xlsx'];
+    end 
+    loadingBarMessage = 'Creating the Excel File...';
+    loadingBar = waitbar(0, loadingBarMessage);
+    images = getappdata(handles.imagesListBox, 'images');
+    currDate = getappdata(handles.imagesListBox, 'currDate');
+    currRatNum = getappdata(handles.imagesListBox, 'currRatNum');
+    currStaining = getappdata(handles.imagesListBox, 'currStaining');
+    currMag = getappdata(handles.imagesListBox, 'currMag');
+    currSection = getappdata(handles.imagesListBox, 'currSection');
+    currImage = getappdata(handles.imagesListBox, 'currImage');
+    nameFieldArray = {images(:).name};
+    objects = getObjectList(images, currSection, currRatNum, currDate, currMag, currStaining);
+    tableOfThresholds = get(handles.sizesTable, 'Data');
+    [thresholds] = getValuesFromTable(tableOfThresholds);
+    loadingBarMessage = sprintf("10%% - Starting Image Processing,\nplease wait this could take a few minutes!");
+    waitbar(0.1, loadingBar, loadingBarMessage);
+    if ~isempty(objects) && ~strcmp(currImage, 'All')
+        imageIndex = find(strcmp(nameFieldArray, currImage));
+        objects = images(imageIndex);
+    end
+    if ~isempty(objects)
+        centers = cell(size(objects, 2),1);
+        radiuses = cell(size(objects,2),1);
+        parfor oIndex = 1: size(objects, 2)
+            [structToExport(oIndex), centers{oIndex}, radiuses{oIndex}] = getCellCountImageForExcel(objects(oIndex), thresholds);
+        end
+        parfor oIndex = 1:size(objects,2)
+            objects(oIndex).Centers = centers{oIndex};
+            objects(oIndex).Radiuses = radiuses{oIndex};
+        end    
+        loadingBarMessage = sprintf("90%% - Image processing finished,\nsaving results to the excel file!");
+        waitbar(0.9, loadingBar, loadingBarMessage);
+        structToExport = countOverlapCircles(objects, structToExport, thresholds);
+        writeToTable = struct2table(structToExport);
+        if exist([path, file],'file') == 2
+            delete([path, file]);
+        end
+        writetable(writeToTable, [path, file]);
+        if exist([path, file], 'file') == 2
+            waitbar(1, loadingBar, '100% - Finished Creating the Excel File!');
+        else
+            waitbar(0, loadingBar, 'Failed To Create The Excel File!');
+        end   
+    end
 end
-if ~isempty(objects)
-    parfor oIndex = 1: size(objects, 2)
-        structToExport(oIndex) = getCellCountImageForExcel(objects(oIndex), thresholds);
-    end
-    loadingBarMessage = sprintf("90%% - Image processing finished,\nsaving results to the excel file!");
-    waitbar(0.9, loadingBar, loadingBarMessage);
-%     precentage = (ceil((oIndex/(size(objects, 2)))*100)-1)/100;
-%     waitbar(precentage, loadingBar, [loadingBarMessage, ' ', num2str(precentage*100), '%']);
-    structToExport = countOverlapCircles(objects, structToExport);
-    writeToTable = struct2table(structToExport);
-    if exist([path, file],'file') == 2
-        delete([path, file]);
-    end
-    writetable(writeToTable, [path, file]);
-    readFromTable = readtable([path, file]);
-    readStruct = cellfun(@num2str,table2cell(readFromTable), 'UniformOutput', false);
-    writeStruct = cellfun(@num2str,table2cell(writeToTable), 'UniformOutput', false);
-    if isequal(readStruct, writeStruct)
-        waitbar(1, loadingBar, '100% - Finished Creating the Excel File!');
-    else
-        waitbar(0, loadingBar, 'Failed To Create The Excel File!');
-    end
-    
-end
-
 % --- Executes on selection change in sectionListBox.
 function sectionListBox_Callback(hObject, eventdata, handles)
 % hObject    handle to sectionListBox (see GCBO)

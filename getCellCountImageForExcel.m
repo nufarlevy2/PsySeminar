@@ -1,4 +1,4 @@
-function [ currFile ] = getCellCountImageForExcel( currFile, thresholds )
+function [ currFile, centers, radiuses ] = getCellCountImageForExcel( currFile, thresholds)
     fos20Min=thresholds(1); fos20Max=thresholds(2); fos4Min=thresholds(3); fos4Max=thresholds(4); dapi20Min=thresholds(5); dapi20Max=thresholds(6); dapi4Min=thresholds(7); dapi4Max=thresholds(8);
     fos20Contrast = 0.04;
     fos4Constrast = 0.02;
@@ -9,21 +9,23 @@ function [ currFile ] = getCellCountImageForExcel( currFile, thresholds )
     if currFile.isFos && currFile.magnification == 20
         currFile.Staining = 'Fos';
         I = getContrastOfImage(currPath, fos20Contrast);
-        count = getNumOfCellsFromImage(currPath, I, fos20Contrast, fos20Min, fos20Max, currPath, currPath);
+        [count, centers, radiuses] = getNumOfCellsFromImage(currPath, I, fos20Contrast, fos20Min, fos20Max, currPath, currPath);
     elseif currFile.isDAPI && currFile.magnification == 4
         currFile.Staining = 'DAPI';
         I = getContrastOfImage(currPath, dapi4Contrast);
-        count = getNumOfCellsFromImage(currPath, I, dapi4Contrast, dapi4Min, dapi4Max, currPath, currPath);
+        [count, centers, radiuses] = getNumOfCellsFromImage(currPath, I, dapi4Contrast, dapi4Min, dapi4Max, currPath, currPath);
     elseif currFile.isDAPI && currFile.magnification == 20
         currFile.Staining = 'DAPI';
         I = getContrastOfImage(currPath, dapi20Contrast);
-        count = getNumOfCellsFromImage(currPath, I, dapi20Contrast, dapi20Min, dapi20Max, currPath, currPath);
+        [count, centers, radiuses] = getNumOfCellsFromImage(currPath, I, dapi20Contrast, dapi20Min, dapi20Max, currPath, currPath);
     elseif currFile.isFos && currFile.magnification == 4
         currFile.Staining = 'Fos';
         I = getContrastOfImage(currPath, fos4Constrast);
-        count = getNumOfCellsFromImage(currPath, I, fos4Constrast, fos4Min, fos4Max, currPath, currPath);
+        [count, centers, radiuses] = getNumOfCellsFromImage(currPath, I, fos4Constrast, fos4Min, fos4Max, currPath, currPath);
     else
         currFile.Staining = "Unknown";
+        centers = [];
+        radiuses = [];
     end
     splitedName = split(currFile.name, '\');
     currFile.Number_Of_Cells = count;
