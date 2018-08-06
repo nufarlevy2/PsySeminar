@@ -22,7 +22,7 @@ function varargout = AnalyzeImageApp6(varargin)
 
 % Edit the above text to modify the response to help AnalyzeImageApp6
 
-% Last Modified by GUIDE v2.5 30-Jul-2018 19:30:01
+% Last Modified by GUIDE v2.5 06-Aug-2018 22:17:08
 
 % Begin initialization code - DO NOT EDIT
 gui_Singleton = 1;
@@ -41,7 +41,7 @@ if nargout
 else
     gui_mainfcn(gui_State, varargin{:});
 end
-warning('off','all');
+% warning('off','all');
 % End initialization code - DO NOT EDIT
 
 
@@ -88,6 +88,8 @@ setappdata(handles.imagesListBox, 'currDate', 'All');
 setappdata(handles.imagesListBox, 'currImage', 'All');
 setappdata(handles.imagesListBox, 'currMag', 'All');
 setappdata(handles.imagesListBox, 'currStaining', 'All');
+setappdata(handles.imagesListBox, 'initialThresholdValue', '');
+setappdata(handles.imagesListBox, 'thresholdJumpValue', '');
 
 
 
@@ -201,9 +203,14 @@ if ~isempty(objects) && ~strcmp(currImage, 'All')
     imageIndex = find(strcmp(nameFieldArray, currImage));
     objects = images(imageIndex);
 end
+initialThreshold = getappdata(handles.imagesListBox, 'initialThresholdValue');
+thresholdJump = getappdata(handles.imagesListBox, 'thresholdJumpValue');
+if strcmp(initialThreshold,'') initialThreshold=0.02; else initialThreshold=str2double(initialThreshold); end
+if strcmp(thresholdJump,'') thresholdJump=0.02; else thresholdJump=str2double(thresholdJump); end
+    
 if ~isempty(objects)
     for oIndex = 1: size(objects,2)
-        [I, imageTitle] = getCellCountImage(objects(oIndex), thresholds);
+        [I, imageTitle] = getCellCountImage(objects(oIndex), thresholds, initialThreshold, thresholdJump);
         figure, imshow(I), title(imageTitle);
     end
 end
@@ -240,11 +247,15 @@ if ~isempty(file)
         imageIndex = find(strcmp(nameFieldArray, currImage));
         objects = images(imageIndex);
     end
+    initialThreshold = getappdata(handles.imagesListBox, 'initialThresholdValue');
+    thresholdJump = getappdata(handles.imagesListBox, 'thresholdJumpValue');
+    if strcmp(initialThreshold,'') initialThreshold=0.02; else initialThreshold=str2double(initialThreshold); end
+    if strcmp(thresholdJump,'') thresholdJump=0.02; else thresholdJump=str2double(thresholdJump); end
     if ~isempty(objects)
         centers = cell(size(objects, 2),1);
         radiuses = cell(size(objects,2),1);
         parfor oIndex = 1: size(objects, 2)
-            [structToExport(oIndex), centers{oIndex}, radiuses{oIndex}] = getCellCountImageForExcel(objects(oIndex), thresholds);
+            [structToExport(oIndex), centers{oIndex}, radiuses{oIndex}] = getCellCountImageForExcel(objects(oIndex), thresholds, initialThreshold, thresholdJump);
         end
         parfor oIndex = 1:size(objects,2)
             objects(oIndex).Centers = centers{oIndex};
@@ -285,6 +296,7 @@ currStaining = getappdata(handles.imagesListBox, 'currStaining');
 currMag = getappdata(handles.imagesListBox, 'currMag');
 names = getImageList(images, currSection, currRatNum, currDate, currMag, currStaining);
 set(handles.imagesListBox , 'string' ,names);
+set(handles.imagesListBox,'Value', 1); 
 
 
 % --- Executes during object creation, after setting all properties.
@@ -325,6 +337,7 @@ currStaining = getappdata(handles.imagesListBox, 'currStaining');
 currMag = getappdata(handles.imagesListBox, 'currMag');
 names = getImageList(images, currSection, currRatNum, currDate, currMag, currStaining);
 set(handles.imagesListBox , 'string' ,names);
+set(handles.imagesListBox,'Value', 1); 
 
 % --- Executes during object creation, after setting all properties.
 function retNumListBox_CreateFcn(hObject, eventdata, handles)
@@ -364,6 +377,7 @@ currStaining = getappdata(handles.imagesListBox, 'currStaining');
 currMag = getappdata(handles.imagesListBox, 'currMag');
 names = getImageList(images, currSection, currRatNum, currDate, currMag, currStaining);
 set(handles.imagesListBox , 'string' ,names);
+set(handles.imagesListBox,'Value', 1);
 
 % --- Executes during object creation, after setting all properties.
 function dateListBox_CreateFcn(hObject, eventdata, handles)
@@ -510,6 +524,7 @@ currDate = getappdata(handles.imagesListBox, 'currDate');
 currRatNum = getappdata(handles.imagesListBox, 'currRatNum');
 names = getImageList(images, currSection, currRatNum, currDate, currMag, currStaining);
 set(handles.imagesListBox , 'string' ,names);
+set(handles.imagesListBox,'Value', 1); 
 
 % --- Executes during object creation, after setting all properties.
 function magnificationListBox_CreateFcn(hObject, eventdata, handles)
@@ -527,6 +542,7 @@ images = extractFileInfoFromDataDir('C:\Users\levyn\Desktop\study\psySeminar\dat
 magnificationListBoxHandler = findobj(0, 'tag', 'magnificationListBox');
 magList = getMagList(images, [], [], [], [], []);
 set(magnificationListBoxHandler , 'string' ,magList);
+
 
 
 % --- Executes on selection change in stainingListBox.
@@ -549,7 +565,7 @@ currDate = getappdata(handles.imagesListBox, 'currDate');
 currRatNum = getappdata(handles.imagesListBox, 'currRatNum');
 names = getImageList(images, currSection, currRatNum, currDate, currMag, currStaining);
 set(handles.imagesListBox , 'string' ,names);
-
+set(handles.imagesListBox,'Value', 1); 
 
 % --- Executes during object creation, after setting all properties.
 function stainingListBox_CreateFcn(hObject, eventdata, handles)
@@ -581,3 +597,68 @@ function sizesTable_CellEditCallback(hObject, eventdata, handles)
 % handles    structure with handles and user data (see GUIDATA)
 disp('sizesTable_CellEditCallback');
 tableValues = get(hObject, 'Data');
+
+
+% --- Executes on button press in closeAllButton.
+function closeAllButton_Callback(hObject, eventdata, handles)
+% hObject    handle to closeAllButton (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+openFigs = findobj('Type','fig');
+for inti = 1:length(openFigs)
+    if ~strcmp(openFigs(inti).Tag, 'figure1')
+        close(openFigs(inti));
+    end
+end
+
+
+
+function initialThresholdInput_Callback(hObject, eventdata, handles)
+% hObject    handle to initialThresholdInput (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+% Hints: get(hObject,'String') returns contents of initialThresholdInput as text
+%        str2double(get(hObject,'String')) returns contents of initialThresholdInput as a double
+value = str2double(get(hObject,'String'));
+if ~isnan(value) && isnumeric(value) && value > 0 && value < 1
+    setappdata(handles.imagesListBox, 'thresholdJumpValue', num2str(value));
+end
+
+% --- Executes during object creation, after setting all properties.
+function initialThresholdInput_CreateFcn(hObject, eventdata, handles)
+% hObject    handle to initialThresholdInput (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    empty - handles not created until after all CreateFcns called
+
+% Hint: edit controls usually have a white background on Windows.
+%       See ISPC and COMPUTER.
+if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
+    set(hObject,'BackgroundColor','white');
+end
+
+
+
+function jumpInput_Callback(hObject, eventdata, handles)
+% hObject    handle to jumpInput (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+% Hints: get(hObject,'String') returns contents of jumpInput as text
+%        str2double(get(hObject,'String')) returns contents of jumpInput as a double
+value = str2double(get(hObject,'String'));
+if ~isnan(value) && isnumeric(value) && value > 0 && value < 1
+    setappdata(handles.imagesListBox, 'initialThresholdValue', num2str(value));
+end
+
+% --- Executes during object creation, after setting all properties.
+function jumpInput_CreateFcn(hObject, eventdata, handles)
+% hObject    handle to jumpInput (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    empty - handles not created until after all CreateFcns called
+
+% Hint: edit controls usually have a white background on Windows.
+%       See ISPC and COMPUTER.
+if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
+    set(hObject,'BackgroundColor','white');
+end

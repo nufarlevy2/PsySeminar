@@ -49,7 +49,7 @@ function [ structFile ] = extractFileInfoFromDataDir(path)
                 recDirStruct(i).fullPath = [recDirStruct(i).folder, '\', isPic{1}];
                 splitedName = split(name{j}, ' ');
                 if length(splitedName) > 2
-                    recDirStruct(i).Staining_Sub_Type = splitedName{2};
+                    recDirStruct(i).Brain_Area = splitedName{2};
                 end
             end
         end
