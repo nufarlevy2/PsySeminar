@@ -1,8 +1,8 @@
 function [ structToExcel ] = countOverlapCircles( objects, structToExcel, thresholds )
     objects = findFilesWithSameParameters(objects, structToExcel);
-    matchIndexInExcel = 1;
     for index = 1:size(objects, 2)
         if ~isempty(objects(index).indexesOfSamePics)
+            matchIndexInExcel = 1;
             matchesIndexes = objects(index).indexesOfSamePics;
             for subIndex = 1:length(objects(index).indexesOfSamePics)
                 count = 0;
@@ -17,12 +17,11 @@ function [ structToExcel ] = countOverlapCircles( objects, structToExcel, thresh
                     end
                     if foundOverlap
                         count = count + 1;
-                        break;
                     end
                 end
                 if count > 0
                     newField = ['Overlap_Cells_Image_Match_Num_',num2str(matchIndexInExcel)];
-                    structToExcel(index).(newField) = objects(matchesIndexes(subIndex)).File_Name;
+                    structToExcel(index).(newField) = objects(matchesIndexes(subIndex)).name;
                     newField = ['Num_Of_Overlap_Cells_Match_Num_',num2str(matchIndexInExcel)];
                     structToExcel(index).(newField) = count;
                     matchIndexInExcel = matchIndexInExcel + 1;
