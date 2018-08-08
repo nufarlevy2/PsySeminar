@@ -22,7 +22,7 @@ function varargout = AnalyzeImageApp6(varargin)
 
 % Edit the above text to modify the response to help AnalyzeImageApp6
 
-% Last Modified by GUIDE v2.5 06-Aug-2018 22:17:08
+% Last Modified by GUIDE v2.5 08-Aug-2018 08:36:10
 
 % Begin initialization code - DO NOT EDIT
 gui_Singleton = 1;
@@ -75,7 +75,7 @@ varargout{1} = handles.output;
 
 
 % imagesListBoxHandler = findobj(0, 'tag', 'imagesListBox');
-images = extractFileInfoFromDataDir('C:\Users\levyn\Desktop\study\psySeminar\data');
+images = extractFileInfoFromDataDir('C:\Users\levyn\Desktop\study\psySeminar\dataNew');
 setappdata(handles.imagesListBox,'images',images);
 setappdata(handles.imagesListBox, 'ratNumList', getRatNumList(images,[],[],[], [], []));
 setappdata(handles.imagesListBox, 'sectionList', getSectionList(images,[],[],[], [], []));
@@ -104,7 +104,7 @@ if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgr
     set(hObject,'BackgroundColor','white');
 end
 disp('imagesListBox_CreateFcn');
-images = extractFileInfoFromDataDir('C:\Users\levyn\Desktop\study\psySeminar\data');
+images = extractFileInfoFromDataDir('C:\Users\levyn\Desktop\study\psySeminar\dataNew');
 imagesListBoxHandler = findobj(0, 'tag', 'imagesListBox');
 % images = getappdata(imagesListBoxHandler, 'images');
 names = getImageList(images, [], [], [], [], []);
@@ -311,7 +311,7 @@ if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgr
     set(hObject,'BackgroundColor','white');
 end
 disp('sectionListBox_CreateFcn');
-images = extractFileInfoFromDataDir('C:\Users\levyn\Desktop\study\psySeminar\data');
+images = extractFileInfoFromDataDir('C:\Users\levyn\Desktop\study\psySeminar\dataNew');
 sectionListBoxHandler = findobj(0, 'tag', 'sectionListBox');
 sections = getSectionList(images, [], [], [], [], []);
 set(sectionListBoxHandler , 'string' ,sections);
@@ -351,7 +351,7 @@ if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgr
     set(hObject,'BackgroundColor','white');
 end
 disp('retNumListBox_CreateFcn');
-images = extractFileInfoFromDataDir('C:\Users\levyn\Desktop\study\psySeminar\data');
+images = extractFileInfoFromDataDir('C:\Users\levyn\Desktop\study\psySeminar\dataNew');
 ratNumListBoxHandler = findobj(0, 'tag', 'retNumListBox');
 ratNums = getRatNumList(images, [], [], [], [], []);
 set(ratNumListBoxHandler , 'string' ,ratNums);
@@ -391,7 +391,7 @@ if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgr
     set(hObject,'BackgroundColor','white');
 end
 disp('dateListBox_CreateFcn');
-images = extractFileInfoFromDataDir('C:\Users\levyn\Desktop\study\psySeminar\data');
+images = extractFileInfoFromDataDir('C:\Users\levyn\Desktop\study\psySeminar\dataNew');
 dateListBoxHandler = findobj(0, 'tag', 'dateListBox');
 dates = getDateList(images, [], [], [], [], []);
 set(dateListBoxHandler , 'string' ,dates);
@@ -538,7 +538,7 @@ if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgr
     set(hObject,'BackgroundColor','white');
 end
 disp('magnificationListBox_CreateFcn');
-images = extractFileInfoFromDataDir('C:\Users\levyn\Desktop\study\psySeminar\data');
+images = extractFileInfoFromDataDir('C:\Users\levyn\Desktop\study\psySeminar\dataNew');
 magnificationListBoxHandler = findobj(0, 'tag', 'magnificationListBox');
 magList = getMagList(images, [], [], [], [], []);
 set(magnificationListBoxHandler , 'string' ,magList);
@@ -579,7 +579,7 @@ if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgr
     set(hObject,'BackgroundColor','white');
 end
 disp('stainingListBox_CreateFcn');
-images = extractFileInfoFromDataDir('C:\Users\levyn\Desktop\study\psySeminar\data');
+images = extractFileInfoFromDataDir('C:\Users\levyn\Desktop\study\psySeminar\dataNew');
 stainingListBoxHandler = findobj(0, 'tag', 'stainingListBox');
 stainingList = getStainingList(images, [], [], [], [], []);
 set(stainingListBoxHandler , 'string' ,stainingList);
@@ -661,4 +661,46 @@ function jumpInput_CreateFcn(hObject, eventdata, handles)
 %       See ISPC and COMPUTER.
 if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
     set(hObject,'BackgroundColor','white');
+end
+
+
+% --- Executes on button press in changeFolderButton.
+function changeFolderButton_Callback(hObject, eventdata, handles)
+% hObject    handle to changeFolderButton (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+disp('');
+path = uigetdir();
+if ~isempty(path)
+    images = extractFileInfoFromDataDir(path);
+    setappdata(handles.imagesListBox,'images',images);
+    imageListBox = getImageList(images, [], [], [], [], []);
+    set(handles.imagesListBox, 'string', imageListBox);
+    set(handles.imagesListBox, 'Value', 1);
+    ratListBox = getRatNumList(images,[],[],[], [], []);
+    setappdata(handles.imagesListBox, 'ratNumList', ratListBox);
+    set(handles.retNumListBox, 'string', ratListBox);
+    set(handles.retNumListBox, 'Value', 1);
+    sectionListBox = getSectionList(images,[],[],[], [], []);
+    setappdata(handles.imagesListBox, 'sectionList', sectionListBox);
+    set(handles.sectionListBox, 'string', sectionListBox);
+    set(handles.sectionListBox, 'Value', 1);
+    dateListBox = getDateList(images,[],[],[], [], []);
+    setappdata(handles.imagesListBox, 'dateList', dateListBox);
+    set(handles.dateListBox, 'string', dateListBox);
+    set(handles.dateListBox, 'Value', 1);
+    stainingListBox = getStainingList(images,[],[],[], [], []);
+    setappdata(handles.imagesListBox, 'stainingList', stainingListBox);
+    set(handles.stainingListBox, 'string', stainingListBox);
+    set(handles.stainingListBox, 'Value', 1);
+    magListBox = getMagList(images,[],[],[], [], []);
+    setappdata(handles.imagesListBox, 'magList', magListBox);
+    set(handles.magnificationListBox, 'string', magListBox);
+    set(handles.magnificationListBox, 'Value', 1);
+    setappdata(handles.imagesListBox, 'currRatNum', 'All');
+    setappdata(handles.imagesListBox, 'currSection', 'All');
+    setappdata(handles.imagesListBox, 'currDate', 'All');
+    setappdata(handles.imagesListBox, 'currImage', 'All');
+    setappdata(handles.imagesListBox, 'currMag', 'All');
+    setappdata(handles.imagesListBox, 'currStaining', 'All');
 end
