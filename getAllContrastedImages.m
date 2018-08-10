@@ -7,18 +7,20 @@ function [ output_args ] = getAllContrastedImages( my_struct, dapi4Threshold, da
         splitFileName = split(my_struct(i).fullPath,'\');
         fileNameWithExtention = splitFileName{length(splitFileName)};
 %         fileName =  fileNameWithExtention(1:(length(fileNameWithExtention)-1-length(my_struct(i).picType)));
-        if my_struct(i).isDAPI == 1 && my_struct(i).magnification == 4 && dapi4Threshold ~= 0
+        if strcmp('DAPI',my_struct(i).staining) && my_struct(i).magnification == 4 && dapi4Threshold ~= 0
             BWImage = getContrastOfImage(my_struct(i).fullPath, dapi4Threshold);
-        elseif my_struct(i).isDAPI == 1 && my_struct(i).magnification == 20 && dapi20Threshold ~= 0
+        elseif strcmp('DAPI',my_struct(i).staining) && my_struct(i).magnification == 20 && dapi20Threshold ~= 0
             BWImage = getContrastOfImage(my_struct(i).fullPath, dapi20Threshold);
-        elseif my_struct(i).isFos == 1 && my_struct(i).magnification == 4 && fos4Threshold ~= 0
+        elseif strcmp('Fos',my_struct(i).staining) && my_struct(i).magnification == 4 && fos4Threshold ~= 0
             BWImage = getContrastOfImage(my_struct(i).fullPath, fos4Threshold);
-        elseif my_struct(i).isFos == 1 && my_struct(i).magnification == 20 && fos20Threshold ~= 0
+        elseif strcmp('Fos',my_struct(i).staining) && my_struct(i).magnification == 20 && fos20Threshold ~= 0
             BWImage = getContrastOfImage(my_struct(i).fullPath, fos20Threshold);
-        elseif my_struct(i).isFos == 1 && my_struct(i).magnification == 5 && fos5Threshold ~= 0
+        elseif strcmp('Fos',my_struct(i).staining) && my_struct(i).magnification == 5 && fos5Threshold ~= 0
             BWImage = getContrastOfImage(my_struct(i).fullPath, fos5Threshold);
-        elseif my_struct(i).isDAPI == 1 && my_struct(i).magnification == 5 && dapi5Threshold ~= 0
+        elseif strcmp('DAPI',my_struct(i).staining) && my_struct(i).magnification == 5 && dapi5Threshold ~= 0
             BWImage = getContrastOfImage(my_struct(i).fullPath, dapi5Threshold);
+        else
+            BWImage = getContrastOfImage(my_struct(i).fullPath, 0.09);
         end
         if exist('BWImage')
             path = [outDir, '\BW_', fileNameWithExtention];

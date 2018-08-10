@@ -9,8 +9,6 @@ function [ structFile ] = extractFileInfoFromDataDir(path)
     for i = 1:sizeOfSruct
         name = split(recDirStruct(i).name,'\');
         recDirStruct(i).isPic = 0;
-        recDirStruct(i).isDAPI = 0;
-        recDirStruct(i).isFos = 0;
         recDirStruct(i).Date = 0;
         recDirStruct(i).RatNum = 0;
         recDirStruct(i).magnification = 0;
@@ -32,15 +30,13 @@ function [ structFile ] = extractFileInfoFromDataDir(path)
                 date = isDate{1,1};
                 recDirStruct(i).Date = date;
             elseif length(isPic) == 1
+                splitedName = split(name{j}, ' ');
                 recDirStruct(i).isPic = 1;
-                isDAPI = regexp(name{j},'^\d{2}\.\d+([A-Z]|[a-z]|[0-9])*_\d+\s{1}((\w+|\w+\.\d+|\w+\-\w+)\s){1}DAPI\s{1}\d+x\.\w+$','match');
-                isFos = regexp(name{j},'^\d{2}\.\d+([A-Z]|[a-z]|[0-9])*_\d+\s{1}((\w+|\w+\.\d+|\w+\-\w+)\s){1}Fos\s{1}\d+x\.\w+$','match');
-                if length(isDAPI) == 1
-                    recDirStruct(i).isDAPI = 1;
-                    recDirStruct(i).staining = 'DAPI';
-                elseif length(isFos) == 1
-                    recDirStruct(i).isFos = 1;
-                    recDirStruct(i).staining = 'Fos';
+                isStaining = regexp(name{j},'^\d{2}\.\d+([A-Z]|[a-z]|[0-9])*_\d+\s{1}((\w+|\w+\.\d+|\w+\-\w+)\s){1}\w+\s{1}\d+x\.\w+$','match');
+                if length(isStaining) == 1
+                    recDirStruct(i).staining = splitedName{length(splitedName)-1};
+                else
+                    recDirStruct(i).staining = 'UNKNOWN';
                 end
                 magnification = regexp(regexp(name{j},'\d+x\.\w+$','match'), '\d+','match');
                 picType = regexp(name{j},'\w+$','match');

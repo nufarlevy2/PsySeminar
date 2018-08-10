@@ -22,7 +22,7 @@ function varargout = AnalyzeImageApp6(varargin)
 
 % Edit the above text to modify the response to help AnalyzeImageApp6
 
-% Last Modified by GUIDE v2.5 08-Aug-2018 08:36:10
+% Last Modified by GUIDE v2.5 10-Aug-2018 09:59:24
 
 % Begin initialization code - DO NOT EDIT
 gui_Singleton = 1;
@@ -41,7 +41,7 @@ if nargout
 else
     gui_mainfcn(gui_State, varargin{:});
 end
-% warning('off','all');
+warning('off','all');
 % End initialization code - DO NOT EDIT
 
 
@@ -198,7 +198,7 @@ currImage = getappdata(handles.imagesListBox, 'currImage');
 nameFieldArray = {images(:).name};
 objects = getObjectList(images, currSection, currRatNum, currDate, currMag, currStaining);
 tableOfThresholds = get(handles.sizesTable, 'Data');
-[thresholds] = getValuesFromTable(tableOfThresholds);
+thresholds = tableOfThresholds;
 if ~isempty(objects) && ~strcmp(currImage, 'All')
     imageIndex = find(strcmp(nameFieldArray, currImage));
     objects = images(imageIndex);
@@ -207,10 +207,10 @@ initialThreshold = getappdata(handles.imagesListBox, 'initialThresholdValue');
 thresholdJump = getappdata(handles.imagesListBox, 'thresholdJumpValue');
 if strcmp(initialThreshold,'') initialThreshold=0.02; else initialThreshold=str2double(initialThreshold); end
 if strcmp(thresholdJump,'') thresholdJump=0.02; else thresholdJump=str2double(thresholdJump); end
-    
+rows = get(handles.sizesTable, 'RowName');
 if ~isempty(objects)
     for oIndex = 1: size(objects,2)
-        [I, imageTitle] = getCellCountImage(objects(oIndex), thresholds, initialThreshold, thresholdJump);
+        [I, imageTitle] = getCellCountImage(objects(oIndex), thresholds, initialThreshold, thresholdJump, rows);
         figure, imshow(I), title(imageTitle);
     end
 end
@@ -224,7 +224,7 @@ function exportToExcel_Callback(hObject, eventdata, handles)
 disp('exportToExcel_Callback');
 filter = {'*xlsx'};
 [file,path] = uiputfile(filter);
-if ~isempty(file)   
+if ~isempty(file) && ~isnumeric(path)
     if isempty(regexp(file, '.xlsx', 'match'))
         file = [file, '.xlsx'];
     end 
@@ -240,7 +240,7 @@ if ~isempty(file)
     nameFieldArray = {images(:).name};
     objects = getObjectList(images, currSection, currRatNum, currDate, currMag, currStaining);
     tableOfThresholds = get(handles.sizesTable, 'Data');
-    [thresholds] = getValuesFromTable(tableOfThresholds);
+    thresholds = tableOfThresholds;
     loadingBarMessage = sprintf("10%% - Starting Image Processing,\nplease wait this could take a few minutes!");
     waitbar(0.1, loadingBar, loadingBarMessage);
     if ~isempty(objects) && ~strcmp(currImage, 'All')
@@ -251,11 +251,12 @@ if ~isempty(file)
     thresholdJump = getappdata(handles.imagesListBox, 'thresholdJumpValue');
     if strcmp(initialThreshold,'') initialThreshold=0.02; else initialThreshold=str2double(initialThreshold); end
     if strcmp(thresholdJump,'') thresholdJump=0.02; else thresholdJump=str2double(thresholdJump); end
+    rows = get(handles.sizesTable, 'RowName');
     if ~isempty(objects)
         centers = cell(size(objects, 2),1);
         radiuses = cell(size(objects,2),1);
-        parfor oIndex = 1: size(objects, 2)
-            [structToExport(oIndex), centers{oIndex}, radiuses{oIndex}] = getCellCountImageForExcel(objects(oIndex), thresholds, initialThreshold, thresholdJump);
+        for oIndex = 1: size(objects, 2)
+            [structToExport(oIndex), centers{oIndex}, radiuses{oIndex}] = getCellCountImageForExcel(objects(oIndex), thresholds, initialThreshold, thresholdJump, rows);
         end
         parfor oIndex = 1:size(objects,2)
             objects(oIndex).Centers = centers{oIndex};
@@ -598,7 +599,6 @@ function sizesTable_CellEditCallback(hObject, eventdata, handles)
 disp('sizesTable_CellEditCallback');
 tableValues = get(hObject, 'Data');
 
-
 % --- Executes on button press in closeAllButton.
 function closeAllButton_Callback(hObject, eventdata, handles)
 % hObject    handle to closeAllButton (see GCBO)
@@ -671,7 +671,7 @@ function changeFolderButton_Callback(hObject, eventdata, handles)
 % handles    structure with handles and user data (see GUIDATA)
 disp('');
 path = uigetdir();
-if ~isempty(path)
+if ~isempty(path) && ~isnumeric(path)
     images = extractFileInfoFromDataDir(path);
     setappdata(handles.imagesListBox,'images',images);
     imageListBox = getImageList(images, [], [], [], [], []);
@@ -704,3 +704,28 @@ if ~isempty(path)
     setappdata(handles.imagesListBox, 'currMag', 'All');
     setappdata(handles.imagesListBox, 'currStaining', 'All');
 end
+
+
+% --- Executes during object creation, after setting all properties.
+function sizesTable_CreateFcn(hObject, eventdata, handles)
+% hObject    handle to sizesTable (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    empty - handles not created until after all CreateFcns called
+disp('sizesTable_CreateFcn');
+images = extractFileInfoFromDataDir('C:\Users\levyn\Desktop\study\psySeminar\dataNew');
+stainingList = getStainingList(images, [], [], [], [], []);
+magnificationList = getMagList(images, [], [], [], [], []);
+stainingList{find(strcmp(stainingList,'UNKNOWN'))} = '';
+stainingList{find(strcmp(stainingList,'All'))} = '';
+magnificationList{find(strcmp(magnificationList,'All'))} = '';
+index = 1;
+for inti = 1:length(stainingList)
+    for intj = 1:length(magnificationList)
+        if ~strcmp(magnificationList{intj},'') && ~strcmp(stainingList{inti},'')
+            rownInTable{index} = [stainingList{inti},magnificationList{intj}];
+            index = index + 1;
+        end
+    end
+end
+rownInTable{index} = 'Other';
+set(hObject, 'RowName', rownInTable);
