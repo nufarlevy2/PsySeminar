@@ -1,6 +1,6 @@
 <deployment-project plugin="plugin.ezdeploy" plugin-version="1.0">
-  <configuration build-checksum="3807989584" file="C:\Users\levyn\MATLAB\Projects\PsySeminar\imageProcessing.prj" location="C:\Users\levyn\MATLAB\Projects\PsySeminar" name="imageProcessing" preferred-package-location="C:\Users\levyn\MATLAB\Projects\PsySeminar\imageProcessing\for_redistribution" preferred-package-type="package.type.exe" target="target.ezdeploy.standalone" target-name="Application Compiler">
-    <param.appname>imageProcessing</param.appname>
+  <configuration build-checksum="1737674974" file="C:\Users\levyn\MATLAB\Projects\PsySeminar\imageProcessing.prj" location="C:\Users\levyn\MATLAB\Projects\PsySeminar" name="imageProcessing" preferred-package-location="C:\Users\levyn\MATLAB\Projects\PsySeminar\imageProcessing\for_redistribution" preferred-package-type="package.type.exe" target="target.ezdeploy.standalone" target-name="Application Compiler">
+    <param.appname>ImageProcessing</param.appname>
     <param.icon>${PROJECT_ROOT}\imageProcessing_resources\icon.ico</param.icon>
     <param.icons>
       <file>${PROJECT_ROOT}\imageProcessing_resources\icon_48.png</file>
@@ -12,13 +12,13 @@
     <param.authnamewatermark>Nufar Levy</param.authnamewatermark>
     <param.email>levynufar@gmail.com</param.email>
     <param.company>TAU</param.company>
-    <param.summary>Cell Counting in Staining Cells</param.summary>
+    <param.summary />
     <param.description />
     <param.screenshot>C:\Users\levyn\Downloads\12.1_09 Cg1 Fos 20x.tif_algoritemResult.jpg</param.screenshot>
     <param.guid />
-    <param.installpath.string>\TAU\imageProcessing\</param.installpath.string>
+    <param.installpath.string>\TAU\ImageProcessing\</param.installpath.string>
     <param.installpath.combo>option.installpath.programfiles</param.installpath.combo>
-    <param.logo>C:\Users\levyn\Downloads\12.1_09 Cg1 Fos 20x.tif_algoritemResult.jpg</param.logo>
+    <param.logo />
     <param.install.notes />
     <param.target.install.notes />
     <param.intermediate>${PROJECT_ROOT}\imageProcessing\for_testing</param.intermediate>
@@ -40,11 +40,15 @@
     <param.log.file />
     <unset>
       <param.version />
+      <param.authnamewatermark />
+      <param.email />
       <param.company />
+      <param.summary />
       <param.description />
       <param.guid />
       <param.installpath.string />
       <param.installpath.combo />
+      <param.logo />
       <param.target.install.notes />
       <param.intermediate />
       <param.files.only />
@@ -88,7 +92,7 @@
       <file>${PROJECT_ROOT}\getStainingList.m</file>
     </fileset.depfun>
     <build-deliverables>
-      <file location="${PROJECT_ROOT}\imageProcessing\for_testing" name="imageProcessing.exe" optional="false">C:\Users\levyn\MATLAB\Projects\PsySeminar\imageProcessing\for_testing\imageProcessing.exe</file>
+      <file location="${PROJECT_ROOT}\imageProcessing\for_testing" name="ImageProcessing.exe" optional="false">C:\Users\levyn\MATLAB\Projects\PsySeminar\imageProcessing\for_testing\ImageProcessing.exe</file>
       <file location="${PROJECT_ROOT}\imageProcessing\for_testing" name="splash.png" optional="false">C:\Users\levyn\MATLAB\Projects\PsySeminar\imageProcessing\for_testing\splash.png</file>
       <file location="${PROJECT_ROOT}\imageProcessing\for_testing" name="readme.txt" optional="true">C:\Users\levyn\MATLAB\Projects\PsySeminar\imageProcessing\for_testing\readme.txt</file>
     </build-deliverables>

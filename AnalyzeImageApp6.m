@@ -255,7 +255,7 @@ if ~isempty(file) && ~isnumeric(path)
     if ~isempty(objects)
         centers = cell(size(objects, 2),1);
         radiuses = cell(size(objects,2),1);
-        for oIndex = 1: size(objects, 2)
+        parfor oIndex = 1: size(objects, 2)
             [structToExport(oIndex), centers{oIndex}, radiuses{oIndex}] = getCellCountImageForExcel(objects(oIndex), thresholds, initialThreshold, thresholdJump, rows);
         end
         parfor oIndex = 1:size(objects,2)
