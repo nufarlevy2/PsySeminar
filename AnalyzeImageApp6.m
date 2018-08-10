@@ -75,7 +75,7 @@ varargout{1} = handles.output;
 
 
 % imagesListBoxHandler = findobj(0, 'tag', 'imagesListBox');
-images = extractFileInfoFromDataDir('C:\Users\levyn\Desktop\study\psySeminar\dataNew');
+images = {};
 setappdata(handles.imagesListBox,'images',images);
 setappdata(handles.imagesListBox, 'ratNumList', getRatNumList(images,[],[],[], [], []));
 setappdata(handles.imagesListBox, 'sectionList', getSectionList(images,[],[],[], [], []));
@@ -104,11 +104,13 @@ if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgr
     set(hObject,'BackgroundColor','white');
 end
 disp('imagesListBox_CreateFcn');
-images = extractFileInfoFromDataDir('C:\Users\levyn\Desktop\study\psySeminar\dataNew');
-imagesListBoxHandler = findobj(0, 'tag', 'imagesListBox');
-% images = getappdata(imagesListBoxHandler, 'images');
-names = getImageList(images, [], [], [], [], []);
-set(imagesListBoxHandler , 'string' ,names);
+% images = extractFileInfoFromDataDir('C:\Users\levyn\Desktop\study\psySeminar\dataNew');
+% imagesListBoxHandler = findobj(0, 'tag', 'imagesListBox');
+% % images = getappdata(imagesListBoxHandler, 'images');
+% names = getImageList(images, [], [], [], [], []);
+% set(imagesListBoxHandler , 'string' ,names);
+allString = {'All'};
+set(hObject , 'string' ,allString);
 
 function imagesListBox_Callback(hObject, eventdata, handles)
 % hObject    handle to retNumListBox (see GCBO)
@@ -120,10 +122,13 @@ function imagesListBox_Callback(hObject, eventdata, handles)
 
 % --- Executes on button press in saveButton.
 disp('imagesListBox_Callback');
-selectedIndex = get(handles.imagesListBox,'Value'); 
-currNames = get(handles.imagesListBox, 'string');
-currImage = currNames(selectedIndex);
-setappdata(handles.imagesListBox, 'currImage', currImage);
+images = getappdata(handles.imagesListBox,'images');
+if ~isempty(images)
+    selectedIndex = get(handles.imagesListBox,'Value'); 
+    currNames = get(handles.imagesListBox, 'string');
+    currImage = currNames(selectedIndex);
+    setappdata(handles.imagesListBox, 'currImage', currImage);
+end
 
 function saveButton_Callback(hObject, eventdata, handles)
 % hObject    handle to saveButton (see GCBO)
@@ -139,24 +144,25 @@ function getContrastedImage_Callback(hObject, eventdata, handles)
 disp('getContrastedImage_Callback');
 names = get(handles.imagesListBox, 'string');
 images = getappdata(handles.imagesListBox,'images');
-nameFieldArray = {images(:).name};
-currImage = getappdata(handles.imagesListBox, 'currImage');
-threshold = get(handles.thresholdLabel, 'string');
-if strcmp(currImage, 'All') && length(names) > 1
-    for intI = 2: length(names)
-        imageIndex = find(strcmp(nameFieldArray, names(intI)));
+if ~isempty(images)
+    nameFieldArray = {images(:).name};
+    currImage = getappdata(handles.imagesListBox, 'currImage');
+    threshold = get(handles.thresholdLabel, 'string');
+    if strcmp(currImage, 'All') && length(names) > 1
+        for intI = 2: length(names)
+            imageIndex = find(strcmp(nameFieldArray, names(intI)));
+            BWPic = getContrastOfImage(images(imageIndex).fullPath, str2double(threshold));
+            figure, imshow(BWPic), title(['Black And White Image: ',images(imageIndex).fullPath]);  
+        end
+    elseif strcmp(currImage, 'All') && length(names) == 1
+        disp('none of the pics were chosen!');
+    else
+        disp('only one folder');
+        imageIndex = find(strcmp(nameFieldArray, currImage));
         BWPic = getContrastOfImage(images(imageIndex).fullPath, str2double(threshold));
-        figure, imshow(BWPic), title(['Black And White Image: ',images(imageIndex).fullPath]);  
+        figure, imshow(BWPic), title(['Black And White Image: ',images(imageIndex).fullPath]);
     end
-elseif strcmp(currImage, 'All') && length(names) == 1
-    disp('none of the pics were chosen!');
-else
-    disp('only one folder');
-    imageIndex = find(strcmp(nameFieldArray, currImage));
-    BWPic = getContrastOfImage(images(imageIndex).fullPath, str2double(threshold));
-    figure, imshow(BWPic), title(['Black And White Image: ',images(imageIndex).fullPath]);
 end
-
 % --- Executes on button press in showOriginImage.
 function showOriginImage_Callback(hObject, eventdata, handles)
 % hObject    handle to showOriginImage (see GCBO)
@@ -165,21 +171,23 @@ function showOriginImage_Callback(hObject, eventdata, handles)
 disp('showOriginImage_Callback');
 names = get(handles.imagesListBox, 'string');
 images = getappdata(handles.imagesListBox,'images');
-nameFieldArray = {images(:).name};
-currImage = getappdata(handles.imagesListBox, 'currImage');
-if strcmp(currImage, 'All') && length(names) > 1
-    for intI = 2: length(names)
-        imageIndex = find(strcmp(nameFieldArray, names(intI)));
+if ~isempty(images)
+    nameFieldArray = {images(:).name};
+    currImage = getappdata(handles.imagesListBox, 'currImage');
+    if strcmp(currImage, 'All') && length(names) > 1
+        for intI = 2: length(names)
+            imageIndex = find(strcmp(nameFieldArray, names(intI)));
+            I = imread(images(imageIndex).fullPath);
+            figure, imshow(I), title(['original image: ',images(imageIndex).fullPath]);  
+        end
+    elseif strcmp(currImage, 'All') && length(names) == 1
+        disp('none of the pics were chosen!');
+    else
+        disp('only one folder');
+        imageIndex = find(strcmp(nameFieldArray, currImage));
         I = imread(images(imageIndex).fullPath);
         figure, imshow(I), title(['original image: ',images(imageIndex).fullPath]);  
     end
-elseif strcmp(currImage, 'All') && length(names) == 1
-    disp('none of the pics were chosen!');
-else
-    disp('only one folder');
-    imageIndex = find(strcmp(nameFieldArray, currImage));
-    I = imread(images(imageIndex).fullPath);
-    figure, imshow(I), title(['original image: ',images(imageIndex).fullPath]);  
 end
 
 % --- Executes on button press in getImageWithMarkedNuerons.
@@ -189,48 +197,7 @@ function getImageWithMarkedNuerons_Callback(hObject, eventdata, handles)
 % handles    structure with handles and user data (see GUIDATA)
 disp('getImageWithMarkedNuerons_Callback');
 images = getappdata(handles.imagesListBox, 'images');
-currDate = getappdata(handles.imagesListBox, 'currDate');
-currRatNum = getappdata(handles.imagesListBox, 'currRatNum');
-currStaining = getappdata(handles.imagesListBox, 'currStaining');
-currMag = getappdata(handles.imagesListBox, 'currMag');
-currSection = getappdata(handles.imagesListBox, 'currSection');
-currImage = getappdata(handles.imagesListBox, 'currImage');
-nameFieldArray = {images(:).name};
-objects = getObjectList(images, currSection, currRatNum, currDate, currMag, currStaining);
-tableOfThresholds = get(handles.sizesTable, 'Data');
-thresholds = tableOfThresholds;
-if ~isempty(objects) && ~strcmp(currImage, 'All')
-    imageIndex = find(strcmp(nameFieldArray, currImage));
-    objects = images(imageIndex);
-end
-initialThreshold = getappdata(handles.imagesListBox, 'initialThresholdValue');
-thresholdJump = getappdata(handles.imagesListBox, 'thresholdJumpValue');
-if strcmp(initialThreshold,'') initialThreshold=0.02; else initialThreshold=str2double(initialThreshold); end
-if strcmp(thresholdJump,'') thresholdJump=0.02; else thresholdJump=str2double(thresholdJump); end
-rows = get(handles.sizesTable, 'RowName');
-if ~isempty(objects)
-    for oIndex = 1: size(objects,2)
-        [I, imageTitle] = getCellCountImage(objects(oIndex), thresholds, initialThreshold, thresholdJump, rows);
-        figure, imshow(I), title(imageTitle);
-    end
-end
-
-
-% --- Executes on button press in exportToExcel.
-function exportToExcel_Callback(hObject, eventdata, handles)
-% hObject    handle to exportToExcel (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    structure with handles and user data (see GUIDATA)
-disp('exportToExcel_Callback');
-filter = {'*xlsx'};
-[file,path] = uiputfile(filter);
-if ~isempty(file) && ~isnumeric(path)
-    if isempty(regexp(file, '.xlsx', 'match'))
-        file = [file, '.xlsx'];
-    end 
-    loadingBarMessage = 'Creating the Excel File...';
-    loadingBar = waitbar(0, loadingBarMessage);
-    images = getappdata(handles.imagesListBox, 'images');
+if ~isempty(images)
     currDate = getappdata(handles.imagesListBox, 'currDate');
     currRatNum = getappdata(handles.imagesListBox, 'currRatNum');
     currStaining = getappdata(handles.imagesListBox, 'currStaining');
@@ -241,8 +208,6 @@ if ~isempty(file) && ~isnumeric(path)
     objects = getObjectList(images, currSection, currRatNum, currDate, currMag, currStaining);
     tableOfThresholds = get(handles.sizesTable, 'Data');
     thresholds = tableOfThresholds;
-    loadingBarMessage = sprintf("10%% - Starting Image Processing,\nplease wait this could take a few minutes!");
-    waitbar(0.1, loadingBar, loadingBarMessage);
     if ~isempty(objects) && ~strcmp(currImage, 'All')
         imageIndex = find(strcmp(nameFieldArray, currImage));
         objects = images(imageIndex);
@@ -253,30 +218,77 @@ if ~isempty(file) && ~isnumeric(path)
     if strcmp(thresholdJump,'') thresholdJump=0.02; else thresholdJump=str2double(thresholdJump); end
     rows = get(handles.sizesTable, 'RowName');
     if ~isempty(objects)
-        centers = cell(size(objects, 2),1);
-        radiuses = cell(size(objects,2),1);
-        parfor oIndex = 1: size(objects, 2)
-            [structToExport(oIndex), centers{oIndex}, radiuses{oIndex}] = getCellCountImageForExcel(objects(oIndex), thresholds, initialThreshold, thresholdJump, rows);
+        for oIndex = 1: size(objects,2)
+            [I, imageTitle] = getCellCountImage(objects(oIndex), thresholds, initialThreshold, thresholdJump, rows);
+            figure, imshow(I), title(imageTitle);
         end
-        parfor oIndex = 1:size(objects,2)
-            objects(oIndex).Centers = centers{oIndex};
-            objects(oIndex).Radiuses = radiuses{oIndex};
-        end    
-        loadingBarMessage = sprintf("90%% - Image processing finished,\nsaving results to the excel file!");
-        waitbar(0.9, loadingBar, loadingBarMessage);
-        structToExport = countOverlapCircles(objects, structToExport, thresholds);
-        writeToTable = struct2table(structToExport);
-        if exist([path, file],'file') == 2
-            delete([path, file]);
-        end
-        writetable(writeToTable, [path, file]);
-        if exist([path, file], 'file') == 2
-            waitbar(1, loadingBar, '100% - Finished Creating the Excel File!');
-        else
-            waitbar(0, loadingBar, 'Failed To Create The Excel File!');
-        end   
     end
 end
+
+% --- Executes on button press in exportToExcel.
+function exportToExcel_Callback(hObject, eventdata, handles)
+% hObject    handle to exportToExcel (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+disp('exportToExcel_Callback');
+images = getappdata(handles.imagesListBox, 'images');
+if ~isempty(images)
+    filter = {'*xlsx'};
+    [file,path] = uiputfile(filter);
+    if ~isempty(file) && ~isnumeric(path)
+        if isempty(regexp(file, '.xlsx', 'match'))
+            file = [file, '.xlsx'];
+        end 
+        loadingBarMessage = 'Creating the Excel File...';
+        loadingBar = waitbar(0, loadingBarMessage);
+        currDate = getappdata(handles.imagesListBox, 'currDate');
+        currRatNum = getappdata(handles.imagesListBox, 'currRatNum');
+        currStaining = getappdata(handles.imagesListBox, 'currStaining');
+        currMag = getappdata(handles.imagesListBox, 'currMag');
+        currSection = getappdata(handles.imagesListBox, 'currSection');
+        currImage = getappdata(handles.imagesListBox, 'currImage');
+        nameFieldArray = {images(:).name};
+        objects = getObjectList(images, currSection, currRatNum, currDate, currMag, currStaining);
+        tableOfThresholds = get(handles.sizesTable, 'Data');
+        thresholds = tableOfThresholds;
+        loadingBarMessage = sprintf("10%% - Starting Image Processing,\nplease wait this could take a few minutes!");
+        waitbar(0.1, loadingBar, loadingBarMessage);
+        if ~isempty(objects) && ~strcmp(currImage, 'All')
+            imageIndex = find(strcmp(nameFieldArray, currImage));
+            objects = images(imageIndex);
+        end
+        initialThreshold = getappdata(handles.imagesListBox, 'initialThresholdValue');
+        thresholdJump = getappdata(handles.imagesListBox, 'thresholdJumpValue');
+        if strcmp(initialThreshold,'') initialThreshold=0.02; else initialThreshold=str2double(initialThreshold); end
+        if strcmp(thresholdJump,'') thresholdJump=0.02; else thresholdJump=str2double(thresholdJump); end
+        rows = get(handles.sizesTable, 'RowName');
+        if ~isempty(objects)
+            centers = cell(size(objects, 2),1);
+            radiuses = cell(size(objects,2),1);
+            parfor oIndex = 1: size(objects, 2)
+                [structToExport(oIndex), centers{oIndex}, radiuses{oIndex}] = getCellCountImageForExcel(objects(oIndex), thresholds, initialThreshold, thresholdJump, rows);
+            end
+            parfor oIndex = 1:size(objects,2)
+                objects(oIndex).Centers = centers{oIndex};
+                objects(oIndex).Radiuses = radiuses{oIndex};
+            end    
+            loadingBarMessage = sprintf("90%% - Image processing finished,\nsaving results to the excel file!");
+            waitbar(0.9, loadingBar, loadingBarMessage);
+            structToExport = countOverlapCircles(objects, structToExport, thresholds);
+            writeToTable = struct2table(structToExport);
+            if exist([path, file],'file') == 2
+                delete([path, file]);
+            end
+            writetable(writeToTable, [path, file]);
+            if exist([path, file], 'file') == 2
+                waitbar(1, loadingBar, '100% - Finished Creating the Excel File!');
+            else
+                waitbar(0, loadingBar, 'Failed To Create The Excel File!');
+            end   
+        end
+    end
+end
+
 % --- Executes on selection change in sectionListBox.
 function sectionListBox_Callback(hObject, eventdata, handles)
 % hObject    handle to sectionListBox (see GCBO)
@@ -288,17 +300,18 @@ function sectionListBox_Callback(hObject, eventdata, handles)
 disp('sectionListBox_Callback');
 selectedIndex = get(handles.sectionListBox,'Value'); 
 images = getappdata(handles.imagesListBox,'images');
-sectionList = getappdata(handles.imagesListBox, 'sectionList');
-currSection = sectionList(selectedIndex);
-setappdata(handles.imagesListBox, 'currSection', currSection);
-currDate = getappdata(handles.imagesListBox, 'currDate');
-currRatNum = getappdata(handles.imagesListBox, 'currRatNum');
-currStaining = getappdata(handles.imagesListBox, 'currStaining');
-currMag = getappdata(handles.imagesListBox, 'currMag');
-names = getImageList(images, currSection, currRatNum, currDate, currMag, currStaining);
-set(handles.imagesListBox , 'string' ,names);
-set(handles.imagesListBox,'Value', 1); 
-
+if ~isempty(images)
+    sectionList = getappdata(handles.imagesListBox, 'sectionList');
+    currSection = sectionList(selectedIndex);
+    setappdata(handles.imagesListBox, 'currSection', currSection);
+    currDate = getappdata(handles.imagesListBox, 'currDate');
+    currRatNum = getappdata(handles.imagesListBox, 'currRatNum');
+    currStaining = getappdata(handles.imagesListBox, 'currStaining');
+    currMag = getappdata(handles.imagesListBox, 'currMag');
+    names = getImageList(images, currSection, currRatNum, currDate, currMag, currStaining);
+    set(handles.imagesListBox , 'string' ,names);
+    set(handles.imagesListBox,'Value', 1); 
+end
 
 % --- Executes during object creation, after setting all properties.
 function sectionListBox_CreateFcn(hObject, eventdata, handles)
@@ -312,10 +325,12 @@ if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgr
     set(hObject,'BackgroundColor','white');
 end
 disp('sectionListBox_CreateFcn');
-images = extractFileInfoFromDataDir('C:\Users\levyn\Desktop\study\psySeminar\dataNew');
-sectionListBoxHandler = findobj(0, 'tag', 'sectionListBox');
-sections = getSectionList(images, [], [], [], [], []);
-set(sectionListBoxHandler , 'string' ,sections);
+% images = extractFileInfoFromDataDir('C:\Users\levyn\Desktop\study\psySeminar\dataNew');
+% sectionListBoxHandler = findobj(0, 'tag', 'sectionListBox');
+% sections = getSectionList(images, [], [], [], [], []);
+% set(sectionListBoxHandler , 'string' ,sections);
+allString = {'All'};
+set(hObject , 'string' ,allString);
 
 
 % --- Executes on selection change in retNumListBox.
@@ -329,16 +344,18 @@ function retNumListBox_Callback(hObject, eventdata, handles)
 disp('retNumListBox_Callback');
 selectedIndex = get(handles.retNumListBox,'Value'); 
 images = getappdata(handles.imagesListBox,'images');
-ratNumList = getappdata(handles.imagesListBox, 'ratNumList');
-currRatNum = ratNumList(selectedIndex);
-setappdata(handles.imagesListBox, 'currRatNum', currRatNum);
-currDate = getappdata(handles.imagesListBox, 'currDate');
-currSection = getappdata(handles.imagesListBox, 'currSection');
-currStaining = getappdata(handles.imagesListBox, 'currStaining');
-currMag = getappdata(handles.imagesListBox, 'currMag');
-names = getImageList(images, currSection, currRatNum, currDate, currMag, currStaining);
-set(handles.imagesListBox , 'string' ,names);
-set(handles.imagesListBox,'Value', 1); 
+if ~isempty(images)
+    ratNumList = getappdata(handles.imagesListBox, 'ratNumList');
+    currRatNum = ratNumList(selectedIndex);
+    setappdata(handles.imagesListBox, 'currRatNum', currRatNum);
+    currDate = getappdata(handles.imagesListBox, 'currDate');
+    currSection = getappdata(handles.imagesListBox, 'currSection');
+    currStaining = getappdata(handles.imagesListBox, 'currStaining');
+    currMag = getappdata(handles.imagesListBox, 'currMag');
+    names = getImageList(images, currSection, currRatNum, currDate, currMag, currStaining);
+    set(handles.imagesListBox , 'string' ,names);
+    set(handles.imagesListBox,'Value', 1); 
+end
 
 % --- Executes during object creation, after setting all properties.
 function retNumListBox_CreateFcn(hObject, eventdata, handles)
@@ -352,10 +369,12 @@ if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgr
     set(hObject,'BackgroundColor','white');
 end
 disp('retNumListBox_CreateFcn');
-images = extractFileInfoFromDataDir('C:\Users\levyn\Desktop\study\psySeminar\dataNew');
-ratNumListBoxHandler = findobj(0, 'tag', 'retNumListBox');
-ratNums = getRatNumList(images, [], [], [], [], []);
-set(ratNumListBoxHandler , 'string' ,ratNums);
+% images = extractFileInfoFromDataDir('C:\Users\levyn\Desktop\study\psySeminar\dataNew');
+% ratNumListBoxHandler = findobj(0, 'tag', 'retNumListBox');
+% ratNums = getRatNumList(images, [], [], [], [], []);
+% set(ratNumListBoxHandler , 'string' ,ratNums);
+allString = {'All'};
+set(hObject , 'string' ,allString);
 
 
 % --- Executes on selection change in dateListBox.
@@ -369,16 +388,18 @@ function dateListBox_Callback(hObject, eventdata, handles)
 disp('dateListBox_Callback');
 selectedIndex = get(handles.dateListBox,'Value'); 
 images = getappdata(handles.imagesListBox,'images');
-dateList = getappdata(handles.imagesListBox, 'dateList');
-currDate = dateList(selectedIndex);
-setappdata(handles.imagesListBox, 'currDate', currDate);
-currRatNum = getappdata(handles.imagesListBox, 'currRatNum');
-currSection = getappdata(handles.imagesListBox, 'currSection');
-currStaining = getappdata(handles.imagesListBox, 'currStaining');
-currMag = getappdata(handles.imagesListBox, 'currMag');
-names = getImageList(images, currSection, currRatNum, currDate, currMag, currStaining);
-set(handles.imagesListBox , 'string' ,names);
-set(handles.imagesListBox,'Value', 1);
+if ~isempty(images)
+    dateList = getappdata(handles.imagesListBox, 'dateList');
+    currDate = dateList(selectedIndex);
+    setappdata(handles.imagesListBox, 'currDate', currDate);
+    currRatNum = getappdata(handles.imagesListBox, 'currRatNum');
+    currSection = getappdata(handles.imagesListBox, 'currSection');
+    currStaining = getappdata(handles.imagesListBox, 'currStaining');
+    currMag = getappdata(handles.imagesListBox, 'currMag');
+    names = getImageList(images, currSection, currRatNum, currDate, currMag, currStaining);
+    set(handles.imagesListBox , 'string' ,names);
+    set(handles.imagesListBox,'Value', 1);
+end
 
 % --- Executes during object creation, after setting all properties.
 function dateListBox_CreateFcn(hObject, eventdata, handles)
@@ -392,10 +413,12 @@ if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgr
     set(hObject,'BackgroundColor','white');
 end
 disp('dateListBox_CreateFcn');
-images = extractFileInfoFromDataDir('C:\Users\levyn\Desktop\study\psySeminar\dataNew');
-dateListBoxHandler = findobj(0, 'tag', 'dateListBox');
-dates = getDateList(images, [], [], [], [], []);
-set(dateListBoxHandler , 'string' ,dates);
+% images = extractFileInfoFromDataDir('C:\Users\levyn\Desktop\study\psySeminar\dataNew');
+% dateListBoxHandler = findobj(0, 'tag', 'dateListBox');
+% dates = getDateList(images, [], [], [], [], []);
+% set(dateListBoxHandler , 'string' ,dates);
+allString = {'All'};
+set(hObject , 'string' ,allString);
 
 
 % --- Executes on slider movement.
@@ -425,7 +448,6 @@ if isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColo
 end
 disp('thresholdSlider_CreateFcn');
 set(hObject, 'Max', 1, 'Min', 0, 'SliderStep' , [1/100,1/100]);
-
 
 
 function thresholdLabel_Callback(hObject, eventdata, handles)
@@ -516,16 +538,18 @@ function magnificationListBox_Callback(hObject, eventdata, handles)
 disp('magnificationListBox_Callback');
 selectedIndex = get(handles.magnificationListBox,'Value'); 
 images = getappdata(handles.imagesListBox,'images');
-magList = getappdata(handles.imagesListBox, 'magList');
-currMag = magList(selectedIndex);
-setappdata(handles.imagesListBox, 'currMag', currMag);
-currSection = getappdata(handles.imagesListBox, 'currSection');
-currStaining = getappdata(handles.imagesListBox, 'currStaining');
-currDate = getappdata(handles.imagesListBox, 'currDate');
-currRatNum = getappdata(handles.imagesListBox, 'currRatNum');
-names = getImageList(images, currSection, currRatNum, currDate, currMag, currStaining);
-set(handles.imagesListBox , 'string' ,names);
-set(handles.imagesListBox,'Value', 1); 
+if ~isempty(images)
+    magList = getappdata(handles.imagesListBox, 'magList');
+    currMag = magList(selectedIndex);
+    setappdata(handles.imagesListBox, 'currMag', currMag);
+    currSection = getappdata(handles.imagesListBox, 'currSection');
+    currStaining = getappdata(handles.imagesListBox, 'currStaining');
+    currDate = getappdata(handles.imagesListBox, 'currDate');
+    currRatNum = getappdata(handles.imagesListBox, 'currRatNum');
+    names = getImageList(images, currSection, currRatNum, currDate, currMag, currStaining);
+    set(handles.imagesListBox , 'string' ,names);
+    set(handles.imagesListBox,'Value', 1); 
+end
 
 % --- Executes during object creation, after setting all properties.
 function magnificationListBox_CreateFcn(hObject, eventdata, handles)
@@ -539,10 +563,12 @@ if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgr
     set(hObject,'BackgroundColor','white');
 end
 disp('magnificationListBox_CreateFcn');
-images = extractFileInfoFromDataDir('C:\Users\levyn\Desktop\study\psySeminar\dataNew');
-magnificationListBoxHandler = findobj(0, 'tag', 'magnificationListBox');
-magList = getMagList(images, [], [], [], [], []);
-set(magnificationListBoxHandler , 'string' ,magList);
+% images = extractFileInfoFromDataDir('C:\Users\levyn\Desktop\study\psySeminar\dataNew');
+% magnificationListBoxHandler = findobj(0, 'tag', 'magnificationListBox');
+% magList = getMagList(images, [], [], [], [], []);
+% set(magnificationListBoxHandler , 'string' ,magList);
+allString = {'All'};
+set(hObject , 'string' ,allString);
 
 
 
@@ -557,16 +583,18 @@ function stainingListBox_Callback(hObject, eventdata, handles)
 disp('stainingListBox_Callback');
 selectedIndex = get(handles.stainingListBox,'Value'); 
 images = getappdata(handles.imagesListBox,'images');
-stainingList = getappdata(handles.imagesListBox, 'stainingList');
-currStaining = stainingList(selectedIndex);
-setappdata(handles.imagesListBox, 'currStaining', currStaining);
-currSection = getappdata(handles.imagesListBox, 'currSection');
-currMag = getappdata(handles.imagesListBox, 'currMag');
-currDate = getappdata(handles.imagesListBox, 'currDate');
-currRatNum = getappdata(handles.imagesListBox, 'currRatNum');
-names = getImageList(images, currSection, currRatNum, currDate, currMag, currStaining);
-set(handles.imagesListBox , 'string' ,names);
-set(handles.imagesListBox,'Value', 1); 
+if ~isempty(images)
+    stainingList = getappdata(handles.imagesListBox, 'stainingList');
+    currStaining = stainingList(selectedIndex);
+    setappdata(handles.imagesListBox, 'currStaining', currStaining);
+    currSection = getappdata(handles.imagesListBox, 'currSection');
+    currMag = getappdata(handles.imagesListBox, 'currMag');
+    currDate = getappdata(handles.imagesListBox, 'currDate');
+    currRatNum = getappdata(handles.imagesListBox, 'currRatNum');
+    names = getImageList(images, currSection, currRatNum, currDate, currMag, currStaining);
+    set(handles.imagesListBox , 'string' ,names);
+    set(handles.imagesListBox,'Value', 1); 
+end
 
 % --- Executes during object creation, after setting all properties.
 function stainingListBox_CreateFcn(hObject, eventdata, handles)
@@ -580,10 +608,12 @@ if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgr
     set(hObject,'BackgroundColor','white');
 end
 disp('stainingListBox_CreateFcn');
-images = extractFileInfoFromDataDir('C:\Users\levyn\Desktop\study\psySeminar\dataNew');
-stainingListBoxHandler = findobj(0, 'tag', 'stainingListBox');
-stainingList = getStainingList(images, [], [], [], [], []);
-set(stainingListBoxHandler , 'string' ,stainingList);
+% images = extractFileInfoFromDataDir('C:\Users\levyn\Desktop\study\psySeminar\dataNew');
+% stainingListBoxHandler = findobj(0, 'tag', 'stainingListBox');
+% stainingList = getStainingList(images, [], [], [], [], []);
+% set(stainingListBoxHandler , 'string' ,stainingList);
+allString = {'All'};
+set(hObject , 'string' ,allString);
 
 
 % --- Executes when entered data in editable cell(s) in sizesTable.
@@ -703,6 +733,22 @@ if ~isempty(path) && ~isnumeric(path)
     setappdata(handles.imagesListBox, 'currImage', 'All');
     setappdata(handles.imagesListBox, 'currMag', 'All');
     setappdata(handles.imagesListBox, 'currStaining', 'All');
+    stainingList = getStainingList(images, [], [], [], [], []);
+    magnificationList = getMagList(images, [], [], [], [], []);
+    stainingList{find(strcmp(stainingList,'UNKNOWN'))} = '';
+    stainingList{find(strcmp(stainingList,'All'))} = '';
+    magnificationList{find(strcmp(magnificationList,'All'))} = '';
+    index = 1;
+    for inti = 1:length(stainingList)
+        for intj = 1:length(magnificationList)
+            if ~strcmp(magnificationList{intj},'') && ~strcmp(stainingList{inti},'')
+                rownInTable{index} = [stainingList{inti},magnificationList{intj}];
+                index = index + 1;
+            end
+        end
+    end
+    rownInTable{index} = 'Other';
+    set(handles.sizesTable, 'RowName', rownInTable);
 end
 
 
@@ -712,20 +758,5 @@ function sizesTable_CreateFcn(hObject, eventdata, handles)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    empty - handles not created until after all CreateFcns called
 disp('sizesTable_CreateFcn');
-images = extractFileInfoFromDataDir('C:\Users\levyn\Desktop\study\psySeminar\dataNew');
-stainingList = getStainingList(images, [], [], [], [], []);
-magnificationList = getMagList(images, [], [], [], [], []);
-stainingList{find(strcmp(stainingList,'UNKNOWN'))} = '';
-stainingList{find(strcmp(stainingList,'All'))} = '';
-magnificationList{find(strcmp(magnificationList,'All'))} = '';
-index = 1;
-for inti = 1:length(stainingList)
-    for intj = 1:length(magnificationList)
-        if ~strcmp(magnificationList{intj},'') && ~strcmp(stainingList{inti},'')
-            rownInTable{index} = [stainingList{inti},magnificationList{intj}];
-            index = index + 1;
-        end
-    end
-end
-rownInTable{index} = 'Other';
-set(hObject, 'RowName', rownInTable);
+rows = {'Other'};
+set(hObject, 'RowName', rows);
