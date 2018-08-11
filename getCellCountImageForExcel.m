@@ -10,7 +10,7 @@ function [ currFile, centers, radiuses ] = getCellCountImageForExcel( currFile, 
         end
     end
     I = getContrastOfImage(currPath, initialThreshold);
-    if sum(find(strcmp([stainingsFromTableRows{:}],currFile.staining))) > 0 && sum(find([magnificationFromTableRows{:}] == currFile.magnification)) > 0 && (find(strcmp(rows,[currFile.staining,num2str(currFile.magnification)])) < length(rows))
+    if sum(find(strcmp([stainingsFromTableRows{:}],currFile.staining))) > 0 && sum(find([magnificationFromTableRows{:}] == currFile.magnification)) > 0 && (find(strcmp(rows,[currFile.staining,num2str(currFile.magnification)])) < size(thresholds,1))
         rowOfThresholds = thresholds(find(strcmp(rows,[currFile.staining,num2str(currFile.magnification)])),:);
         rowOfThresholds{1} = str2num(rowOfThresholds{1});
         rowOfThresholds{2} = str2num(rowOfThresholds{2});

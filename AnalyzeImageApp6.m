@@ -751,7 +751,6 @@ if ~isempty(path) && ~isnumeric(path)
     set(handles.sizesTable, 'RowName', rownInTable);
 end
 
-
 % --- Executes during object creation, after setting all properties.
 function sizesTable_CreateFcn(hObject, eventdata, handles)
 % hObject    handle to sizesTable (see GCBO)
