@@ -9,6 +9,7 @@ function [ count, resultCenters, resultRadiuses ] = getNumOfCellsFromImage( path
     count = 0;
     countIndexes = [];
     index = 1;
+%    figure, imshow(I);
     for inti = 1:length(relevantRadius)
         if relevantRadius(inti) >= minThreshold && relevantRadius(inti) <= maxThreshold
             foundOverlap = false;
@@ -45,8 +46,8 @@ function [ count, resultCenters, resultRadiuses ] = getNumOfCellsFromImage( path
         end
         imwrite(resultImage, [nameOfPic,'_resultImage.tif'], 'tif', 'WriteMode', 'overwrite');
         imwrite(I, [nameOfPic,'_tmpImage.tif'],'tif', 'WriteMode', 'overwrite');
-%          figure, imshow(I);
-%          figure, imshow(resultImage);
+%        figure, imshow(I);
+%        figure, imshow(resultImage);
     end
     if ~isempty(countIndexes)
         resultCenters = relevantCentersToBeColored;
