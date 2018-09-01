@@ -735,9 +735,15 @@ if ~isempty(path) && ~isnumeric(path)
     setappdata(handles.imagesListBox, 'currStaining', 'All');
     stainingList = getStainingList(images, [], [], [], [], []);
     magnificationList = getMagList(images, [], [], [], [], []);
-    stainingList{find(strcmp(stainingList,'UNKNOWN'))} = '';
-    stainingList{find(strcmp(stainingList,'All'))} = '';
-    magnificationList{find(strcmp(magnificationList,'All'))} = '';
+    if ~isempty(stainingList{find(strcmp(stainingList,'UNKNOWN'))})
+        stainingList{find(strcmp(stainingList,'UNKNOWN'))} = '';
+    end
+    if ~isempty(stainingList{find(strcmp(stainingList,'All'))})
+        stainingList{find(strcmp(stainingList,'All'))} = '';
+    end
+    if ~isempty(magnificationList{find(strcmp(magnificationList,'All'))})
+        magnificationList{find(strcmp(magnificationList,'All'))} = '';
+    end
     index = 1;
     for inti = 1:length(stainingList)
         for intj = 1:length(magnificationList)
